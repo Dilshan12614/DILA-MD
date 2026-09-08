@@ -1,13 +1,16 @@
 name: DANUWA-MD
+
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
   run:
     runs-on: ubuntu-latest
     timeout-minutes: 350
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -16,6 +19,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'npm'
 
       - name: Install Dependencies
         run: npm install
