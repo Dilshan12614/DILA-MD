@@ -1,7 +1,7 @@
 {
   "name": "DANUWA-MD",
   "version": "1.0.0",
-  "description": "A Powerfull Whatsapp Bot",
+  "description": "A Powerful WhatsApp Bot",
   "main": "index.js",
   "scripts": {
     "start": "pm2 start index.js --deep-monitoring --attach --name DANUWA-MD",
@@ -33,4 +33,4 @@
     "util": "^0.12.4",
     "vm": "^0.1.0"
   }
-
+}
