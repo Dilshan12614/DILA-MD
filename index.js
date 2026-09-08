@@ -122,35 +122,36 @@ if (connection === 'open') {
 
   return;
 
- if (connection === 'close') {
-    const statusCode =
-      lastDisconnect?.error?.output?.statusCode;
+if (connection === 'close') {
+  const statusCode =
+    lastDisconnect?.error?.output?.statusCode;
 
-    console.log(
-      `❌ WhatsApp connection closed. Status: ${statusCode || 'unknown'}`
-    );
+  console.log(
+    `❌ WhatsApp connection closed. Status: ${statusCode || 'unknown'}`
+  );
 
-    console.log('Disconnect error:', lastDisconnect?.error);
+  console.log('Disconnect error:', lastDisconnect?.error);
 
-    if (statusCode === DisconnectReason.loggedOut) {
-      console.log('🚪 Session logged out.');
-      return;
-    }
-
-    console.log('🔄 Reconnecting in 5 seconds...');
-
-    setTimeout(() => {
-      connectToWA();
-    }, 5000);
+  if (statusCode === DisconnectReason.loggedOut) {
+    console.log('🚪 Session logged out.');
+    return;
   }
-});
+
+  console.log('🔄 Reconnecting in 5 seconds...');
+
+  setTimeout(() => {
+    connectToWA();
+  }, 5000);
+}
+
+});   // connection.update එක close කරන එක
 
 
 // මේවා connection open/close වලින් පිටත තියෙන්න ඕන
 danuwa.ev.on('creds.update', saveCreds);
 
 danuwa.ev.on('messages.upsert', async ({ messages }) => {
-  // ඔයාගේ messages code එක මෙතන
+  // මෙතන ඔයාගේ ORIGINAL messages code එක
 });
 danuwa.ev.on('creds.update', saveCreds);
 
