@@ -68,24 +68,44 @@ async function connectToWA() {
   const { version } = await fetchLatestBaileysVersion();
 
   const danuwa = makeWASocket({
-    logger: P({ level: 'silent' }),
-    printQRInTerminal: false,
-    browser: Browsers.macOS("Firefox"),
-    auth: state,
-    version,
-    syncFullHistory: true,
-    markOnlineOnConnect: true,
-    generateHighQualityLinkPreview: true,
-  });
+  logger: P({ level: 'silent' }),
+  printQRInTerminal: false,
+  browser: Browsers.macOS('Firefox'),
+  auth: state,
+  version,
+  syncFullHistory: true,
+  markOnlineOnConnect: true,
+  generateHighQualityLinkPreview: true
+});
 
-  danuwa.ev.on('connection.update', async (update) => {
-    const { connection, lastDisconnect } = update;
-    if (connection === 'close') {
-      if (lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) {
-        connectToWA();
-      }
-    } else if (connection === 'open') {
-      console.log('✅ DANUWA-MD connected to WhatsApp');
+danuwa.ev.on('connection.update', async (update) => {
+  const { connection, lastDisconnect } = update;
+
+  if (connection === 'open') {
+    console.log('✅ DANUWA-MD connected to WhatsApp');
+    return;
+  }
+
+  if (connection === 'close') {
+    const statusCode =
+      lastDisconnect?.error?.output?.statusCode;
+
+    console.log(
+      `❌ WhatsApp connection closed. Status: ${statusCode || 'unknown'}`
+    );
+
+    if (statusCode === DisconnectReason.loggedOut) {
+      console.log('🚪 Session logged out. Please generate a new session.');
+      return;
+    }
+
+    console.log('🔄 Reconnecting in 5 seconds...');
+
+    setTimeout(() => {
+      connectToWA();
+    }, 5000);
+  }
+}); 
 
       const up = `DANUWA-MD connected ✅\n\nPREFIX: ${prefix}`;
       await danuwa.sendMessage(ownerNumber[0] + "@s.whatsapp.net", {
