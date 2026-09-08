@@ -83,6 +83,22 @@ danuwa.ev.on('connection.update', async (update) => {
 
   if (connection === 'open') {
     console.log('✅ DANUWA-MD connected to WhatsApp');
+
+    const up = `DANUWA-MD connected ✅\n\nPREFIX: ${prefix}`;
+
+    await danuwa.sendMessage(ownerNumber[0] + '@s.whatsapp.net', {
+      image: {
+        url: 'https://github.com/DANUWA-MD/DANUWA-MD/blob/main/images/DANUWA-MD.png?raw=true'
+      },
+      caption: up
+    });
+
+    fs.readdirSync('./plugins/').forEach((plugin) => {
+      if (path.extname(plugin).toLowerCase() === '.js') {
+        require(`./plugins/${plugin}`);
+      }
+    });
+
     return;
   }
 
@@ -105,23 +121,9 @@ danuwa.ev.on('connection.update', async (update) => {
       connectToWA();
     }, 5000);
   }
-}); 
+});
 
-      const up = `DANUWA-MD connected ✅\n\nPREFIX: ${prefix}`;
-      await danuwa.sendMessage(ownerNumber[0] + "@s.whatsapp.net", {
-        image: { url: `https://github.com/DANUWA-MD/DANUWA-MD/blob/main/images/DANUWA-MD.png?raw=true` },
-        caption: up
-      });
-
-      fs.readdirSync("./plugins/").forEach((plugin) => {
-        if (path.extname(plugin).toLowerCase() === ".js") {
-          require(`./plugins/${plugin}`);
-        }
-      });
-    }
-  });
-
-  danuwa.ev.on('creds.update', saveCreds);
+danuwa.ev.on('creds.update', saveCreds);
 
   danuwa.ev.on('messages.upsert', async ({ messages }) => {
     for (const msg of messages) {
