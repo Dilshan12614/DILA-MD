@@ -68,92 +68,40 @@ async function connectToWA() {
   const { version } = await fetchLatestBaileysVersion();
 
   const danuwa = makeWASocket({
-  logger: P({ level: 'silent' }),
-  printQRInTerminal: false,
-  browser: Browsers.macOS('Firefox'),
-  auth: state,
-  version,
-  syncFullHistory: true,
-  markOnlineOnConnect: true,
-  generateHighQualityLinkPreview: true
-});
-
-danuwa.ev.on('connection.update', async (update) => {
-  const { connection, lastDisconnect } = update;
-
-  if (connection === 'open') {
-    console.log('✅ DANUWA-MD connected to WhatsApp');
-
-    const up = `DANUWA-MD connected ✅\n\nPREFIX: ${prefix}`;
-
-    await danuwa.sendMessage(ownerNumber[0] + '@s.whatsapp.net', {
-      image: {
-        url: 'https://github.com/DANUWA-MD/DANUWA-MD/blob/main/images/DANUWA-MD.png?raw=true'
-      },
-      caption: up
-    });
-
-    fs.readdirSync('./plugins/').forEach((plugin) => {
-      if (path.extname(plugin).toLowerCase() === '.js') {
-        require(`./plugins/${plugin}`);
-      }
-    });
-
-    return;
-
-  
-if (connection === 'open') {
-  console.log('✅ DANUWA-MD connected to WhatsApp');
-
-  const up = `DANUWA-MD connected ✅\n\nPREFIX: ${prefix}`;
-
-  await danuwa.sendMessage(ownerNumber[0] + '@s.whatsapp.net', {
-    image: {
-      url: 'https://github.com/DANUWA-MD/DANUWA-MD/blob/main/images/DANUWA-MD.png?raw=true'
-    },
-    caption: up
+    logger: P({ level: 'silent' }),
+    printQRInTerminal: false,
+    browser: Browsers.macOS("Firefox"),
+    auth: state,
+    version,
+    syncFullHistory: true,
+    markOnlineOnConnect: true,
+    generateHighQualityLinkPreview: true,
   });
 
-  fs.readdirSync('./plugins/').forEach((plugin) => {
-    if (path.extname(plugin).toLowerCase() === '.js') {
-      require(`./plugins/${plugin}`);
+  danuwa.ev.on('connection.update', async (update) => {
+    const { connection, lastDisconnect } = update;
+    if (connection === 'close') {
+      if (lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut) {
+        connectToWA();
+      }
+    } else if (connection === 'open') {
+      console.log('✅ DANUWA-MD connected to WhatsApp');
+
+      const up = `DANUWA-MD connected ✅\n\nPREFIX: ${prefix}`;
+      await danuwa.sendMessage(ownerNumber[0] + "@s.whatsapp.net", {
+        image: { url: `https://github.com/DANUWA-MD/DANUWA-MD/blob/main/images/DANUWA-MD.png?raw=true` },
+        caption: up
+      });
+
+      fs.readdirSync("./plugins/").forEach((plugin) => {
+        if (path.extname(plugin).toLowerCase() === ".js") {
+          require(`./plugins/${plugin}`);
+        }
+      });
     }
   });
 
-  return;
-
-if (connection === 'close') {
-  const statusCode =
-    lastDisconnect?.error?.output?.statusCode;
-
-  console.log(
-    `❌ WhatsApp connection closed. Status: ${statusCode || 'unknown'}`
-  );
-
-  console.log('Disconnect error:', lastDisconnect?.error);
-
-  if (statusCode === DisconnectReason.loggedOut) {
-    console.log('🚪 Session logged out.');
-    return;
-  }
-
-  console.log('🔄 Reconnecting in 5 seconds...');
-
-  setTimeout(() => {
-    connectToWA();
-  }, 5000);
-}
-
-});   
-
-
-// මේවා connection open/close වලින් පිටත තියෙන්න ඕන
-danuwa.ev.on('creds.update', saveCreds);
-
-danuwa.ev.on('messages.upsert', async ({ messages }) => {
-  // මෙතන ඔයාගේ ORIGINAL messages code එක
-});
-danuwa.ev.on('creds.update', saveCreds);
+  danuwa.ev.on('creds.update', saveCreds);
 
   danuwa.ev.on('messages.upsert', async ({ messages }) => {
     for (const msg of messages) {
@@ -234,6 +182,4 @@ app.get("/", (req, res) => {
   res.send("Hey, DANUWA-MD started✅");
 });
 
-app.listen(port, () => {
-  console.log(`Server listening on http://localhost:${port}`);
-});
+app.listen(port, () => console.log(`Server listening on http://localhost:${port}`));
