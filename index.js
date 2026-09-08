@@ -144,7 +144,7 @@ if (connection === 'close') {
   }, 5000);
 }
 
-});   // connection.update එක close කරන එක
+});   
 
 
 // මේවා connection open/close වලින් පිටත තියෙන්න ඕන
