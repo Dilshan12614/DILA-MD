@@ -1,7 +1,7 @@
 {
   "name": "DANUWA-MD",
   "version": "1.0.0",
-  "description": "A Powerful WhatsApp Bot",
+  "description": "A Powerfull Whatsapp Bot",
   "main": "index.js",
   "scripts": {
     "start": "pm2 start index.js --deep-monitoring --attach --name DANUWA-MD",
@@ -9,7 +9,7 @@
     "restart": "pm2 restart DANUWA-MD"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "6.7.9",
+    "@whiskeysockets/baileys": "^6.7.16",
     "api-dylux": "^1.8.5",
     "axios": "^1.9.0",
     "browser-id3-writer": "^6.2.0",
