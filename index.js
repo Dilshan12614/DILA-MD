@@ -122,28 +122,29 @@ if (connection === 'open') {
 
   return;
 
-
  if (connection === 'close') {
-  const statusCode =
-    lastDisconnect?.error?.output?.statusCode;
+    const statusCode =
+      lastDisconnect?.error?.output?.statusCode;
 
-  console.log(
-    `❌ WhatsApp connection closed. Status: ${statusCode || 'unknown'}`
-  );
+    console.log(
+      `❌ WhatsApp connection closed. Status: ${statusCode || 'unknown'}`
+    );
 
-  console.log('Disconnect error:', lastDisconnect?.error);
+    console.log('Disconnect error:', lastDisconnect?.error);
 
-  if (statusCode === DisconnectReason.loggedOut) {
-    console.log('🚪 Session logged out.');
-    return;
+    if (statusCode === DisconnectReason.loggedOut) {
+      console.log('🚪 Session logged out.');
+      return;
+    }
+
+    console.log('🔄 Reconnecting in 5 seconds...');
+
+    setTimeout(() => {
+      connectToWA();
+    }, 5000);
   }
+});
 
-  console.log('🔄 Reconnecting in 5 seconds...');
-
-  setTimeout(() => {
-    connectToWA();
-  }, 5000);
-}
 
 // මේවා connection open/close වලින් පිටත තියෙන්න ඕන
 danuwa.ev.on('creds.update', saveCreds);
@@ -232,4 +233,6 @@ app.get("/", (req, res) => {
   res.send("Hey, DANUWA-MD started✅");
 });
 
-app.listen(port, () => console.log(`Server listening on http://localhost:${port}`));
+app.listen(port, () => {
+  console.log(`Server listening on http://localhost:${port}`);
+});
