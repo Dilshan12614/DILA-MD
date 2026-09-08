@@ -100,29 +100,57 @@ danuwa.ev.on('connection.update', async (update) => {
     });
 
     return;
-  }
 
-  if (connection === 'close') {
-    const statusCode =
-      lastDisconnect?.error?.output?.statusCode;
+  
+if (connection === 'open') {
+  console.log('✅ DANUWA-MD connected to WhatsApp');
 
-    console.log(
-      `❌ WhatsApp connection closed. Status: ${statusCode || 'unknown'}`
-    );
+  const up = `DANUWA-MD connected ✅\n\nPREFIX: ${prefix}`;
 
-    if (statusCode === DisconnectReason.loggedOut) {
-      console.log('🚪 Session logged out. Please generate a new session.');
-      return;
+  await danuwa.sendMessage(ownerNumber[0] + '@s.whatsapp.net', {
+    image: {
+      url: 'https://github.com/DANUWA-MD/DANUWA-MD/blob/main/images/DANUWA-MD.png?raw=true'
+    },
+    caption: up
+  });
+
+  fs.readdirSync('./plugins/').forEach((plugin) => {
+    if (path.extname(plugin).toLowerCase() === '.js') {
+      require(`./plugins/${plugin}`);
     }
+  });
 
-    console.log('🔄 Reconnecting in 5 seconds...');
+  return;
 
-    setTimeout(() => {
-      connectToWA();
-    }, 5000);
+
+ if (connection === 'close') {
+  const statusCode =
+    lastDisconnect?.error?.output?.statusCode;
+
+  console.log(
+    `❌ WhatsApp connection closed. Status: ${statusCode || 'unknown'}`
+  );
+
+  console.log('Disconnect error:', lastDisconnect?.error);
+
+  if (statusCode === DisconnectReason.loggedOut) {
+    console.log('🚪 Session logged out.');
+    return;
   }
-});
 
+  console.log('🔄 Reconnecting in 5 seconds...');
+
+  setTimeout(() => {
+    connectToWA();
+  }, 5000);
+}
+
+// මේවා connection open/close වලින් පිටත තියෙන්න ඕන
+danuwa.ev.on('creds.update', saveCreds);
+
+danuwa.ev.on('messages.upsert', async ({ messages }) => {
+  // ඔයාගේ messages code එක මෙතන
+});
 danuwa.ev.on('creds.update', saveCreds);
 
   danuwa.ev.on('messages.upsert', async ({ messages }) => {
