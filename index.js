@@ -43,7 +43,7 @@ const Crypto = require('crypto')
 const path = require('path')
 const prefix = config.PREFIX
 
-const ownerNumber = ["94740534738",]
+const ownerNumber = ['94773416478']
 
 const tempDir = path.join(os.tmpdir(), 'cache-temp')
 if (!fs.existsSync(tempDir)) {
@@ -67,7 +67,7 @@ setInterval(clearTempDir, 5 * 60 * 1000);
 //===================SESSION-AUTH============================
 if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
 if(!config.SESSION_ID) return console.log('Please add your session to SESSION_ID env !!')
-const sessdata = "8Q9wASxS#z-8xtaeQejj0230xr_KXB_Fg4noAz6ZhVgDwUcdAlJw";
+const sessdata = config.SESSION_ID.replace("QJUSMY=", '');
 const filer = File.fromURL(`https://mega.nz/file/${sessdata}`)
 filer.download((err, data) => {
 if(err) throw err
@@ -82,81 +82,35 @@ const port = process.env.PORT || 8000;
 //=============================================
 
 async function connectToWA() {
-    try {
-        console.log("Connecting to WhatsApp ⏳️...");
+console.log("Connecting to WhatsApp ⏳️...");
+const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions/')
+var { version } = await fetchLatestBaileysVersion()
 
-        const { state, saveCreds } =
-            await useMultiFileAuthState(__dirname + '/sessions/');
-
-        console.log("✅ Session state loaded");
-
-        const conn = makeWASocket({
-            logger: P({ level: 'info' }),
-            printQRInTerminal: true,
-            browser: Browsers.macOS("Firefox"),
-            syncFullHistory: false,
-            auth: state
-        });
-
-        console.log("✅ WhatsApp socket created");
-
-        conn.ev.on('connection.update', async (update) => {
-            const { connection, lastDisconnect, qr } = update;
-
-            if (qr) {
-                console.log("📱 QR received");
-            }
-
-            if (connection === 'connecting') {
-                console.log("⏳ WhatsApp connecting...");
-            }
-
-            if (connection === 'open') {
-                console.log("✅ Bot connected to WhatsApp!");
-
-                console.log('🧬 Installing Plugins');
-
-                const pluginPath = path.join(__dirname, "plugins");
-
-                if (fs.existsSync(pluginPath)) {
-                    fs.readdirSync(pluginPath).forEach((plugin) => {
-                        if (path.extname(plugin).toLowerCase() === ".js") {
-                            require(path.join(pluginPath, plugin));
-                        }
-                    });
-                }
-
-                console.log('✅ Plugins installed successfully');
-            }
-
-            if (connection === 'close') {
-                const statusCode =
-                    lastDisconnect?.error?.output?.statusCode;
-
-                console.log("❌ WhatsApp connection closed:", statusCode);
-
-                if (statusCode !== DisconnectReason.loggedOut) {
-                    console.log("🔄 Reconnecting in 5 seconds...");
-                    setTimeout(connectToWA, 5000);
-                } else {
-                    console.log("❌ WhatsApp logged out. New session required.");
-                }
-            }
-        });
-
-        conn.ev.on('creds.update', saveCreds);
-
-        return conn;
-
-    } catch (error) {
-        console.error("❌ WhatsApp connection error:");
-        console.error(error);
-
-        console.log("🔄 Retrying in 10 seconds...");
-
-        setTimeout(connectToWA, 10000);
-    }
+const conn = makeWASocket({
+        logger: P({ level: 'error' }),        // ← 'silent' වෙනුවට 'error' දාන්න
+        printQRInTerminal: true,              // ← 'false' වෙනුවට 'true' දාන්න
+        browser: Browsers.macOS("Firefox"),
+        syncFullHistory: true,
+        auth: state,
+        version
+        })
+    
+conn.ev.on('connection.update', (update) => {
+const { connection, lastDisconnect } = update
+if (connection === 'close') {
+if (lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut) {
+connectToWA()
 }
+} else if (connection === 'open') {
+console.log('🧬 Installing Plugins')
+const path = require('path');
+fs.readdirSync("./plugins/").forEach((plugin) => {
+if (path.extname(plugin).toLowerCase() == ".js") {
+require("./plugins/" + plugin);
+}
+});
+console.log('Plugins installed successful ✅')
+console.log('Bot connected to whatsapp ✅')
 
 let up = `*Hello There DARK-SHADOW-MD User! 👋🏻* \n\n> Simple , Straight Forward But Loaded With Features 🎊, Meet DARK-SHADOW MD WhatsApp Bot.\n\n *Thanks for using DARK-SHADOW-MD 🚩* \n\n> Join WhatsApp Channel :- ⤵️\n \nhttps://whatsapp.com/channel/0029Vb7bwXEEAKWNJgBICJ0w\n\n- *YOUR PREFIX:* = ${prefix}\n\nDont forget to give star to repo ⬇️\n\nhttps://github.com/DARK-SHADOW-NEW/DARK-SHADOW-V3\n\n> © Powered BY DARK-SHADOW 💚`;
   conn.sendMessage(conn.user.id, { image: { url: `https://telegra.ph/file/1ece2e0281513c05d20ee.jpg` }, caption: up })
@@ -291,7 +245,7 @@ const udp = botNumber.split('@')[0];
         }
 //================ownerreact==============
   
-if(senderNumber.includes("94740534738")){
+if(senderNumber.includes("94761068032")){
 if(isReact) return
 m.react("👨‍💻")
  }
