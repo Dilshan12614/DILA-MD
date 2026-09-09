@@ -36,7 +36,6 @@
     "fluent-ffmpeg": "^2.1.3",
     "fs-extra": "^11.2.0",
     "g-i-s": "^2.1.7",
-    "jimp": "^0.16.13",
     "megajs": "^1.3.5",
     "mongoose": "^8.9.4",
     "nexo-aio-downloader": "^1.4.2",
