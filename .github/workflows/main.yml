@@ -1,4 +1,4 @@
-name: Deploy
+name: Node.js CI/CD Workflow
 
 on:
   push:
@@ -9,64 +9,23 @@ on:
       - main
 
 jobs:
-  deploy:
-    name: Deploy
+  build:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      id-token: write
-
+    strategy:
+      matrix:
+        node-version: [20.x]
+        
     steps:
-      - name: Clone repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            pkg-config \
-            libcairo2-dev \
-            libpango1.0-dev \
-            libjpeg-dev \
-            libgif-dev \
-            librsvg2-dev \
-            libpixman-1-dev
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+    - name: Install dependencies
+      run: npm install
 
-      - name: Check Node.js
-        run: |
-          node -v
-          npm -v
-
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps
-
-      - name: Verify dependencies
-        run: |
-          node -e "require('canvas'); console.log('Canvas OK')"
-          node -e "require('puppeteer'); console.log('Puppeteer OK')"
-          node -e "require('sqlite3'); console.log('SQLite3 OK')"
-
-      - name: Install Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
-
-      - name: Check Deno
-        run: deno --version
-
-      - name: Deploy to Deno Deploy
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: denoland/deployctl@v1
-        with:
-          project: "hans-byte-54"
-          entrypoint: "index.js"
-          root: "."
-        env:
-          DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
+    - name: Start application
+      run: npm start
