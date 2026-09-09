@@ -69,7 +69,7 @@ console.log("Connecting HANS BYTE");
 const { state, saveCreds } = await useMultiFileAuthState(__dirname + "/sessions/");
 const { version } = await fetchLatestBaileysVersion();
 
-const robin = makeWASocket({
+const conn = makeWASocket({
   logger: P({ level: "silent" }),
   printQRInTerminal: false,
   browser: Browsers.macOS("Firefox"),
