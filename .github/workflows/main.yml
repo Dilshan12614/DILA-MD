@@ -1,42 +1,33 @@
-name: Deploy
+name: DILA-MD Bot
 on:
   push:
-    branches: main
-  pull_request:
-    branches: main
+    branches: [ main ]
+  workflow_dispatch: # අතින් run කරන්න පුළුවන්
 
 jobs:
-  deploy:
-    name: Deploy
+  run-bot:
     runs-on: ubuntu-latest
-
-    permissions:
-      id-token: write # Needed for auth with Deno Deploy
-      contents: read # Needed to clone the repository
-
+    timeout-minutes: 350 # 6hrs වලට කලින් නැවතිලා ආයෙ start වෙනවා
+    
     steps:
-      - name: Clone repository
+      - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Install Deno
-        uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
-
-      - name: Install Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: '20'  # Node 20 LTS. Baileys වලට stable
+          node-version: '20'
+          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps  # <-- මේක තමයි fix එක
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
 
-      - name: Build step
-        run: npm run build --if-present  # <-- start නෙමෙයි
+      - name: Install FFmpeg
+        run: sudo apt-get install -y ffmpeg imagemagick
 
-      - name: Upload to Deno Deploy
-        uses: denoland/deployctl@v1
-        with:
-          project: "hans-byte-54"
-          entrypoint: "index.js"
-          root: ""
+      - name: Start Bot
+        run: node index.js
+        env:
+          # මේකෙ ඔයාගෙ .env variables දාන්න
+          SESSION_ID: ${{ secrets.SESSION_ID }}
+          OWNER_NUMBER: ${{ secrets.OWNER_NUMBER }}
