@@ -1,78 +1,72 @@
-// Import the built-in filesystem module to check for file existence.
-const fs = require("fs");
+const fs = require('fs');
+if (fs.existsSync('config.env')) require('dotenv').config({ path: './config.env' });
 
-// Check if the configuration file exists, and if so, load environment variables from it.
-
-
-const dotenvPath = fs.existsSync(".env")
-  ? ".env"
-  : fs.existsSync("config.env")
-  ? "config.env"
-  : null;
-
-if (dotenvPath) {
-  require("dotenv").config({ path: dotenvPath });
+function convertToBool(text, fault = 'true') {
+    return text === fault ? true : false;
 }
-
-
-
-// Application Configuration Object
 module.exports = {
-  // Session and Owner Information
-  SESSION_ID: process.env.SESSION_ID || "8Q9wASxS#z-8xtaeQejj0230xr_KXB_Fg4noAz6ZhVgDwUcdAlJw", // Add your session ID here
-  SUDO: process.env.SUDO || "94740534738", // Add your admin/sudo number here
-  OWNER_NUM: process.env.OWNER_NUM || "94740534738", // Add the owner's number here
-  OWNER_NAME: process.env.OWNER_NAME || "HANS TECH", // Add the owner's name here
-  OWNER_EMAIL: process.env.OWNER_EMAIL || "your@email.com", // Add your email address here
-  OWNER_LOCATION: process.env.OWNER_LOCATION || "Africa/Douala", // Add your location here
-  OWNER_GITHUB: process.env.OWNER_GITHUB || "https://github.com/HansTech1", // Add your GitHub profile URL here
-
-  // API Keys for third-party services
-  OMDB_API_KEY: process.env.OMDB_API_KEY || "5e339fb7", // Add your OMDB API key here
-  GEMINI_API_KEY: process.env.GEMINI_API_KEY || "AIzaSyDrhALyWLk7RN40C1sX5a03XVk8tO48P_8", // Add your Gemini API key here
-  MOVIE_API_KEY: process.env.MOVIE_API_KEY || "sky|d154108e41377cceb22ef92434509bc9081ae46b", // Add your Movie API key here
-
-  // Bot Settings
-  BOT_NAME: process.env.BOT_NAME || "𝙷𝙰𝙽𝚂 𝙱𝚈𝚃𝙴", // Add your bot's name here
-  PREFIX: process.env.PREFIX || ".", // Add your command prefix here (e.g., ".", "!", "/")
-  MODE: process.env.MODE || "public", // Set your bot mode (e.g., "public" or "private")
-  VERSION: process.env.VERSION || "2.5.0", // Bot version (do not change unless updating)
-  STATUS_MESSAGE: process.env.STATUS_MESSAGE || "🚀 𝙋𝙤𝙬𝙚𝙧𝙚𝙙 𝙗𝙮 𝙃𝘼𝙉𝙎-𝙗𝙮𝙩𝙚", // Customize the bot's status message
-
-  // Auto Features (toggle features on/off)
-  AUTO_REACT: process.env.AUTO_REACT || "true", // Enable/disable auto reaction (true/false)
-  PUBLIC_MODE: process.env.PUBLIC_MODE || "true",
-  AUTO_VOICE: process.env.AUTO_VOICE || "true", // Enable/disable auto voice messages (true/false)
-  AUTO_STICKER: process.env.AUTO_STICKER || "true", // Enable/disable auto sticker rea (true/false)
-  AUTO_REPLY: process.env.AUTO_REPLY || "true", // Enable/disable auto reply feature (true/false)
-  AUTO_READ_STATUS: process.env.AUTO_READ_STATUS || "true", // Enable/disable auto read status (true/false)
-  CUSTOM_REACT: process.env.CUSTOM_REACT || "true",
-  CUSTOM_REACT_EMOJIS: process.env.CUSTOM_REACT_EMOJIS || "💝,💖,💗,❤️‍🩹,❤️,🧡,💛,💚,💙,💜,🤎,🖤,🤍",
-  ANTI_LINK: process.env.ANTI_LINK || "true",
-  ANTI_DELETE: process.env.ANTI_DELETE || "false",
-  AUTO_TYPING: process.env.AUTO_TYPING || "true",
-  ALWAYSONLINE: process.env.ALWAYSONLINE || "true",
-  AUTO_RECORDING: process.env.AUTO_RECORDING || "true",
-  AUTO_STATUS_SEEN: process.env.AUTO_STATUS_SEEN || "true",
-  AUTO_STATUS_REACT: process.env.AUTO_STATUS_REACT || "true",
-  READ_MESSAGE: process.env.READ_MESSAGE || "true",
-  ANTI_BAD: process.env.ANTI_BAD || "true",
-  AUTO_STATUS_REPLY: process.env.AUTO_STATUS_REPLY || "true",
-  WELCOME: process.env.WELCOME || "true",
-
-  // Alive Message & Image
-  ALIVE_IMG: process.env.ALIVE_IMG || "https://i.ibb.co/6Rxhg321/Chat-GPT-Image-Mar-30-2025-03-39-42-AM.png", // Add your alive image URL here
-  ALIVE_MSG: process.env.ALIVE_MSG || "Hello , I am alive now!!", // Customize the alive message here
-
-  // Sticker Settings
-  STICKER_PACKNAME: process.env.STICKER_PACKNAME || "HANS BYTE MD", // Set your sticker pack name here
-  STICKER_AUTHOR: process.env.STICKER_AUTHOR || "HANS TECH", // Set your sticker author name here
-
-  // Image Sizes
-  GROUP_PP_SIZE: process.env.GROUP_PP_SIZE || 512, // Set the group profile picture size here
-  USER_PP_SIZE: process.env.USER_PP_SIZE || 640, // Set the user profile picture size here
-
-  // Miscellaneous
-  GITHUB: process.env.GITHUB || "HaroldMth", // Add your GitHub username here
-  TIMEZONE: process.env.TIMEZONE || "𝙒𝘼𝙏+1" // Set your timezone here (e.g., "WAT+1")
+SESSION_ID: process.env.SESSION_ID || "8Q9wASxS#z-8xtaeQejj0230xr_KXB_Fg4noAz6ZhVgDwUcdAlJw",
+// add your Session Id 
+AUTO_STATUS_SEEN: process.env.AUTO_STATUS_SEEN || "true",
+// make true or false status auto seen
+AUTO_STATUS_REPLY: process.env.AUTO_STATUS_REPLY || "false",
+// make true if you want auto reply on status 
+AUTO_STATUS_REACT: process.env.AUTO_STATUS_REACT || "true",
+// make true if you want auto reply on status 
+AUTO_STATUS_MSG: process.env.AUTO_STATUS_MSG || "*SEEN YOUR STATUS BY DARK-SHADOW -MD 🤍*",
+// set the auto reply massage on status reply  
+PREFIX: process.env.PREFIX || ".",
+// add your prifix for bot   
+BOT_NAME: process.env.BOT_NAME || "DARK SHADOW-MD",
+// add bot namw here for menu
+STICKER_NAME: process.env.STICKER_NAME || "DARK-SHADOW-MD",
+// type sticker pack name 
+CUSTOM_REACT: process.env.CUSTOM_REACT || "false",
+// make this true for custum emoji react    
+CUSTOM_REACT_EMOJIS: process.env.CUSTOM_REACT_EMOJIS || "💝,💖,💗,❤️‍🩹,❤️,🧡,💛,💚,💙,💜,🤎,🖤,🤍",
+// chose custom react emojis by yourself 
+DELETE_LINKS: process.env.DELETE_LINKS || "false",
+// automatic delete links witho remove member 
+OWNER_NUMBER: process.env.OWNER_NUMBER || "94773416478",
+// add your bot owner number
+OWNER_NAME: process.env.OWNER_NAME || "DARK SHADOW",
+// add bot owner name
+DESCRIPTION: process.env.DESCRIPTION || "*© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅᴀʀᴋ ꜱʜᴀᴅᴏᴡ ᴍᴅ*",
+// add bot owner name    
+ALIVE_IMG: process.env.ALIVE_IMG || "https://telegra.ph/file/1ece2e0281513c05d20ee.jpg",
+// add img for alive msg
+LIVE_MSG: process.env.LIVE_MSG || "> HELLO I'AM *DARK-SHADOW-MD*⚡",
+// add alive msg here 
+READ_MESSAGE: process.env.READ_MESSAGE || "false",
+// Turn true or false for automatic read msgs
+AUTO_REACT: process.env.AUTO_REACT || "false",
+// make this true or false for auto react on all msgs
+ANTI_BAD: process.env.ANTI_BAD || "false",
+// false or true for anti bad words  
+MODE: process.env.MODE || "public",
+// make bot public-private-inbox-group 
+ANTI_LINK: process.env.ANTI_LINK || "false",
+// make anti link true,false for groups 
+AUTO_VOICE: process.env.AUTO_VOICE || "false",
+// make true for send automatic voices
+AUTO_STICKER: process.env.AUTO_STICKER || "false",
+// make true for automatic stickers 
+AUTO_REPLY: process.env.AUTO_REPLY || "false",
+// make true or false automatic text reply 
+ALWAYS_ONLINE: process.env.ALWAYS_ONLINE || "false",
+// maks true for always online 
+PUBLIC_MODE: process.env.PUBLIC_MODE || "true",
+// make false if want private mod
+AUTO_TYPING: process.env.AUTO_TYPING || "false",
+// true for automatic show typing   
+READ_CMD: process.env.READ_CMD || "false",
+// true if want mark commands as read 
+DEV: process.env.DEV || "94773416478",
+//replace with your whatsapp number        
+ANTI_VV: process.env.ANTI_VV || "true",
+// true for anti once view 
+ANTI_DEL_PATH: process.env.ANTI_DEL_PATH || "log", 
+// change it to 'same' if you want to resend deleted message in same chat 
+AUTO_RECORDING: process.env.AUTO_RECORDING || "false"
+// make it true for auto recoding 
 };
