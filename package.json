@@ -1,11 +1,11 @@
 {
-  "name": "luxalgo-MD",
+  "name": "SENU-MD",
   "version": "4.5.0",
-  "description": "A WhatsApp Bot Created By pathummalsara",
+  "description": "A WhatsApp Bot Created By JESTER",
   "main": "index.js",
   "scripts": {
-    "start": "pm2 start index.js --deep-monitoring --attach --name LUXALGO-MD",
-    "stop": "pm2 stop LUXALGO",
+    "start": "pm2 start index.js --deep-monitoring --attach --name SENU-MD",
+    "stop": "pm2 stop SENU-MD",
     "restart": "pm2 restart SENU-MD"
   },
   "dependencies": {
