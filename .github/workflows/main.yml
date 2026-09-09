@@ -1,32 +1,42 @@
-name: DILA-MD Bot
+name: Deploy
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches: main
+  pull_request:
+    branches: main
 
 jobs:
-  run-bot:
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
-    timeout-minutes: 350 
-    
+
+    permissions:
+      id-token: write # Needed for auth with Deno Deploy
+      contents: read # Needed to clone the repository
+
     steps:
-      - name: Checkout Repo
+      - name: Clone repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          # cache: 'npm'  <-- මේක අයින් කරා
+          node-version: lts/*
 
-      - name: Install Dependencies
-        run: npm install --legacy-peer-deps
+      - name: Install step
+        run: "npm install"
 
-      - name: Install FFmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg imagemagick
+      - name: Build step
+        run: "npm start"
 
-      - name: Start Bot
-        run: node index.js
-        env:
-          SESSION_ID: ${{ secrets.SESSION_ID }}
-          OWNER_NUMBER: ${{ secrets.OWNER_NUMBER }}
+      - name: Upload to Deno Deploy
+        uses: denoland/deployctl@v1
+        with:
+          project: "hans-byte-54"
+          entrypoint: "index.js"
+          root: ""
