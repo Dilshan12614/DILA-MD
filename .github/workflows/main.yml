@@ -38,7 +38,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
 
       - name: Check Node.js
         run: |
@@ -48,15 +47,19 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Verify installation
+      - name: Verify dependencies
         run: |
-          node -e "console.log('Node OK:', process.version)"
           node -e "require('canvas'); console.log('Canvas OK')"
+          node -e "require('puppeteer'); console.log('Puppeteer OK')"
+          node -e "require('sqlite3'); console.log('SQLite3 OK')"
 
       - name: Install Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
+
+      - name: Check Deno
+        run: deno --version
 
       - name: Deploy to Deno Deploy
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
