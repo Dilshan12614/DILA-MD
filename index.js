@@ -245,7 +245,7 @@ const udp = botNumber.split('@')[0];
         }
 //================ownerreact==============
   
-if(senderNumber.includes("94761068032")){
+if(senderNumber.includes("94772194789")){
 if(isReact) return
 m.react("👨‍💻")
  }
