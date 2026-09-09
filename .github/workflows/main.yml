@@ -15,12 +15,12 @@ jobs:
 
     permissions:
       contents: read
+      id-token: write
 
     steps:
       - name: Clone repository
         uses: actions/checkout@v4
 
-      # Install dependencies required by canvas
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -34,7 +34,6 @@ jobs:
             librsvg2-dev \
             libpixman-1-dev
 
-      # Node.js 22
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
@@ -45,29 +44,23 @@ jobs:
           node -v
           npm -v
 
-      # Install project dependencies
       - name: Install dependencies
-        run: |
-          npm install --legacy-peer-deps
+        run: npm install --legacy-peer-deps
 
-      # Check important dependencies
       - name: Verify dependencies
         run: |
           node -e "require('canvas'); console.log('Canvas OK')"
           node -e "require('puppeteer'); console.log('Puppeteer OK')"
           node -e "require('sqlite3'); console.log('SQLite3 OK')"
 
-      # Install Deno
       - name: Install Deno
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
       - name: Check Deno
-        run: |
-          deno --version
+        run: deno --version
 
-      # Deploy only when pushing to main
       - name: Deploy to Deno Deploy
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: denoland/deployctl@v1
@@ -75,4 +68,3 @@ jobs:
           project: "hans-byte-54"
           entrypoint: "index.js"
           root: "."
-          token: ${{ secrets.DENO_DEPLOY_TOKEN }}
