@@ -15,7 +15,7 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write
+      
 
     steps:
       - name: Clone repository
@@ -68,3 +68,5 @@ jobs:
           project: "hans-byte-54"
           entrypoint: "index.js"
           root: "."
+        env:
+          DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
