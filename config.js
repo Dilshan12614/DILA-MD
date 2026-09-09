@@ -19,9 +19,9 @@ if (dotenvPath) {
 // Application Configuration Object
 module.exports = {
   // Session and Owner Information
-  SESSION_ID: process.env.SESSION_ID || "QJUSMY=y5oTkC5C#kL1ejSVKRaxJEcTd6vrZk2mLWxV3H2HlwVEq7JKLIBo", // Add your session ID here
-  SUDO: process.env.SUDO || "94772194789", // Add your admin/sudo number here
-  OWNER_NUM: process.env.OWNER_NUM || "94772194789", // Add the owner's number here
+  SESSION_ID: process.env.SESSION_ID || "8Q9wASxS#z-8xtaeQejj0230xr_KXB_Fg4noAz6ZhVgDwUcdAlJw", // Add your session ID here
+  SUDO: process.env.SUDO || "94740534738", // Add your admin/sudo number here
+  OWNER_NUM: process.env.OWNER_NUM || "94740534738", // Add the owner's number here
   OWNER_NAME: process.env.OWNER_NAME || "HANS TECH", // Add the owner's name here
   OWNER_EMAIL: process.env.OWNER_EMAIL || "your@email.com", // Add your email address here
   OWNER_LOCATION: process.env.OWNER_LOCATION || "Africa/Douala", // Add your location here
