@@ -132,7 +132,7 @@ cmd(
 
         
 
-╰┈➤ > ⚡*POWERED BY DILA MD*⚡
+> ╰┈➤  ⚡*POWERED BY DILA MD*⚡
 
 `;
 
