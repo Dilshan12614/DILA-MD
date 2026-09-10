@@ -87,7 +87,7 @@ cmd(
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 
 ✦━━━━━━━━━━━━━━━━━━━━━━✦
-        *DILA 𝐌𝐃*
+       🧑‍💻*DILA 𝐌𝐃*🧑‍💻
 ✦━━━━━━━━━━━━━━━━━━━━━━✦
 
 > *POWERED BY DILSHAN*
@@ -128,7 +128,7 @@ cmd(
 ┃   🚀 *Stay Connected With Us*
 ┃   💫 *Updates • Features • News*
 ┃
-╰━━━━━━━━━━━━━━━━━━━━━━
+╰━━━━━━━━━━━━━━━━━━━━━
 
         
 > ⚡*POWERED BY DILA MD*⚡
