@@ -15,25 +15,25 @@ cmd({
 },
 async (conn, mek, m, { from }) => {
     try {
-        const ownerNumber = config.OWNER_NUM || "94740534738"; // fallback number
-        const ownerName = config.OWNER_NAME || "HANS TECH";
-        const ownerEmail = config.OWNER_EMAIL || "hans.tech@gmail.com"; // email එකත් add කරා
+        const ownerNumber = config.OWNER_NUM || "94772194789";
+        const ownerName = config.OWNER_NAME || "DILA MD";
+        const ownerEmail = config.OWNER_EMAIL || "dilamd@gmail.com";
 
-        const cleanNumber = ownerNumber.replace(/[^0-9]/g, ''); // + අයින් කරන safe method
+        const cleanNumber = ownerNumber.replace(/[^0-9]/g, '');
 
         const vcard = `BEGIN:VCARD
 VERSION:3.0
 FN:${ownerName}
 N:${ownerName};;;
-ORG:Hans Tech
+ORG:DILA MD
 TITLE:Founder & Developer
 TEL;TYPE=CELL,VOICE;waid=${cleanNumber}:${ownerNumber}
 EMAIL:${ownerEmail}
 URL:https://hans-byte-pair.onrender.com
-NOTE:This is the official contact card of HANS TECH
+NOTE:This is the official contact card of DILA MD
 END:VCARD
 `;
-        
+
         await conn.sendMessage(from, {
             contacts: {
                 displayName: ownerName,
@@ -42,23 +42,23 @@ END:VCARD
         }, { quoted: mek });
 
         await conn.sendMessage(from, {
-            image: { url: 'https://i.ibb.co/PS5DZdJ/Chat-GPT-Image-Mar-30-2025-12-53-39-PM.png' },
-            caption: `╭━━〔 *HANS BYTE* 〕━━┈⊷
+            image: { url: 'https://i.ibb.co/6JrfGTrG/temp-image.jpg' },
+            caption: `╭━━〔 *DILA MD* 〕━━┈⊷
 ┃◈╭─────────────·๏
 ┃◈┃• *Here is the owner details*
 ┃◈┃• *Name* - ${ownerName}
-┃◈┃• *Number* ${ownerNumber}
-┃◈┃• *Version*: ${config.VERSION || "1.0.0"}
+┃◈┃• *Number* - ${ownerNumber}
+┃◈┃• *Version* - ${config.VERSION || "1.0.0"}
 ┃◈└───────────┈⊷
 ╰──────────────┈⊷
-> © *HANS BYTE MD*`,
+> ✦ *DILA MD*`,
             contextInfo: {
                 mentionedJid: [`${cleanNumber}@s.whatsapp.net`],
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: '120363292876277898@newsletter',
-                    newsletterName: "𝐇𝐀𝐍𝐒 𝐁𝐘𝐓𝐄 𝐌𝐃",
+                    newsletterName: "DILA 𝐌𝐃",
                     serverMessageId: 143
                 }
             }
@@ -76,6 +76,10 @@ END:VCARD
 
     } catch (error) {
         console.error("[ERROR] An error occurred:", error);
-        await conn.sendMessage(from, { text: `An error occurred: ${error.message}` }, { quoted: mek });
+        await conn.sendMessage(
+            from,
+            { text: `An error occurred: ${error.message}` },
+            { quoted: mek }
+        );
     }
 });
