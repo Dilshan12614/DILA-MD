@@ -41,7 +41,7 @@ cmd(
       await danuwa.sendMessage(
   from,
   {
-    image: { url: "https://n.uguu.se/PbeEXJzq.jpg" },
+    image: { url: "https://i.ibb.co/6JrfGTrG/temp-image.jpg" },
     caption: menuText.trim()
   },
   { quoted: mek }
