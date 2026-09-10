@@ -7,7 +7,7 @@ const audioPath = path.join(__dirname, '../media/goku_owner.mp3');
 
 cmd({
     pattern: "owner",
-    alias: ["dev", "hans", "byte", "bot"],
+    alias: ["dev", "dila", "bot"],
     react: "✅",
     desc: "Get owner number",
     category: "main",
@@ -15,8 +15,8 @@ cmd({
 },
 async (conn, mek, m, { from }) => {
     try {
-        const ownerNumber = config.OWNER_NUM || "94772194789";
-        const ownerName = config.OWNER_NAME || "DILA MD";
+        const ownerNumber = "94772194789";
+        const ownerName = "DILA MD";
         const ownerEmail = config.OWNER_EMAIL || "dilamd@gmail.com";
 
         const cleanNumber = ownerNumber.replace(/[^0-9]/g, '');
@@ -29,8 +29,7 @@ ORG:DILA MD
 TITLE:Founder & Developer
 TEL;TYPE=CELL,VOICE;waid=${cleanNumber}:${ownerNumber}
 EMAIL:${ownerEmail}
-URL:https://hans-byte-pair.onrender.com
-NOTE:This is the official contact card of DILA MD
+NOTE:Official contact card of DILA MD
 END:VCARD
 `;
 
@@ -42,23 +41,26 @@ END:VCARD
         }, { quoted: mek });
 
         await conn.sendMessage(from, {
-            image: { url: 'https://i.ibb.co/6JrfGTrG/temp-image.jpg' },
-            caption: `╭━━〔 *DILA MD* 〕━━┈⊷
+            image: {
+                url: 'https://i.ibb.co/6JrfGTrG/temp-image.jpg'
+            },
+            caption: `╭━━〔 DILA MD 〕━━┈⊷
 ┃◈╭─────────────·๏
-┃◈┃• *Here is the owner details*
-┃◈┃• *Name* - ${ownerName}
-┃◈┃• *Number* - ${ownerNumber}
-┃◈┃• *Version* - ${config.VERSION || "1.0.0"}
+┃◈┃• Here is the owner details
+┃◈┃• Name - ${ownerName}
+┃◈┃• Number - ${ownerNumber}
+┃◈┃• Version - ${config.VERSION || "1.0.0"}
 ┃◈└───────────┈⊷
 ╰──────────────┈⊷
-> ✦ *DILA MD*`,
+
+> ✦POWERED BY DILA MD`,
             contextInfo: {
                 mentionedJid: [`${cleanNumber}@s.whatsapp.net`],
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: '120363292876277898@newsletter',
-                    newsletterName: "DILA 𝐌𝐃",
+                    newsletterName: "DILA MD",
                     serverMessageId: 143
                 }
             }
@@ -70,15 +72,16 @@ END:VCARD
                 mimetype: 'audio/mp4',
                 ptt: true
             }, { quoted: mek });
-        } else {
-            console.warn("[WARN] Audio file not found:", audioPath);
         }
 
     } catch (error) {
         console.error("[ERROR] An error occurred:", error);
+
         await conn.sendMessage(
             from,
-            { text: `An error occurred: ${error.message}` },
+            {
+                text: `An error occurred: ${error.message}`
+            },
             { quoted: mek }
         );
     }
