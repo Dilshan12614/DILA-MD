@@ -14,8 +14,8 @@ async (conn, mek, m, { from, reply, pushname }) => {
         if (!mek) return reply("Error: Message object is missing.");
 
         await conn.sendMessage(from, { 
-            image: { url: config.ALIVE_IMG }, 
-            caption: `*HEY DEAR* ${pushname}\n*Hans Byte MD INJECTING...🤫*`
+            image: { url:'https://i.ibb.co/6JrfGTrG/temp-image.jpg' }, 
+            caption: `*HEY DEAR* ${pushname}\n*DILA MD INJECTING...🤫*`
         }, { quoted: mek });
         
         await sleep(2000);  // Sleep for 2 seconds
