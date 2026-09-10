@@ -67,25 +67,29 @@ cmd(
 
       let madeMenu = `
 
-👋 *Hello ${pushname || "User"}*
+╭━━━〔 🚀 𝐇𝐀𝐍𝐒 𝐁𝐘𝐓𝐄 𝐌𝐃 〕━━━╮
+┃
+┃  ✨ *WELCOME TO HANS BYTE MD*
+┃
+┃  🤖 Your Personal WhatsApp Assistant
+┃  ⚡ Fast • Smart • Powerful
+┃  🛠️ Multi-Feature Bot
+┃
+╰━━━━━━━━━━━━━━━━━━━━━━╯
 
-╭━〔 🚀 𝐇𝐀𝐍𝐒 𝐁𝐘𝐓𝐄 𝐌𝐃 〕━┈⊷
-┃◈╭──────────────·๏
-┃◈┃• 👑 Owner : *${config.OWNER_NAME}*
-┃◈┃• ⚙️ Prefix : *[${config.PREFIX}]*
-┃◈┃• 📱 Number : *${config.OWNER_NUM}*
-┃◈┃• ★ Created by : *𝐇𝐀𝐍𝐒 TECH*
-┃◈┃• 📅 Date : *${new Date().toLocaleDateString()}*
-┃◈┃• ⏰ Time : *${new Date().toLocaleTimeString()}*
-┃◈┃• 🌐 Platform : *${platform}*
-┃◈┃• 📦 Version : *2.5.0*
-┃◈┃• ⏱️ Runtime : *${runtime(process.uptime())}*
-┃◈╰──────────────┈⊷
-╰━━━━━━━━━━━━━━━━┈⊷
+╭━━〔 📡 BOT CENTER 〕━━╮
+┃
+┃  👋 Hello, *${pushname || "User"}*
+┃  📚 Commands : *${commands.length}*
+┃  🔰 Prefix   : *${config.PREFIX}*
+┃  ⏱️ Uptime   : *${runtime(process.uptime())}*
+┃
+╰━━━━━━━━━━━━━━━━━━━━━━╯
 
-✧⋄⋆⋅⋆⋄✧⋄⋆⋅⋆⋄✧⋄⋆⋅⋆⋄✧
-        *HANS BYTE MD*
-✧⋄⋆⋅⋆⋄✧⋄⋆⋅⋆⋄✧⋄⋆⋅⋆⋄✧
+✦━━━━━━━━━━━━━━━━━━━━━━✦
+        *𝐇𝐀𝐍𝐒 𝐁𝐘𝐓𝐄 𝐌𝐃*
+✦━━━━━━━━━━━━━━━━━━━━━━✦
+
 
 `;
 
