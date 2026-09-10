@@ -67,9 +67,9 @@ cmd(
 
       let madeMenu = `
 
-╭━━━〔 🚀 𝐇𝐀𝐍𝐒 𝐁𝐘𝐓𝐄 𝐌𝐃 〕━━━╮
+╭━━━〔 🚀 DILA 𝐌𝐃 〕━━━╮
 ┃
-┃  ✨ *WELCOME TO HANS BYTE MD*
+┃  ✨ *WELCOME TO DILA MD*
 ┃
 ┃  🤖 Your Personal WhatsApp Assistant
 ┃  ⚡ Fast • Smart • Powerful
@@ -77,7 +77,7 @@ cmd(
 ┃
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 
-╭━━〔 📡 BOT CENTER 〕━━╮
+╭━━〔 🤖 𝐁𝐎𝐓 𝐈𝐍𝐅𝐎 〕━━━╮
 ┃
 ┃  👋 Hello, *${pushname || "User"}*
 ┃  📚 Commands : *${commands.length}*
@@ -87,9 +87,10 @@ cmd(
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 
 ✦━━━━━━━━━━━━━━━━━━━━━━✦
-        *𝐇𝐀𝐍𝐒 𝐁𝐘𝐓𝐄 𝐌𝐃*
+        *DILA 𝐌𝐃*
 ✦━━━━━━━━━━━━━━━━━━━━━━✦
 
+> *POWERED BY DILSHAN*
 
 `;
 
@@ -119,15 +120,20 @@ cmd(
       // ==========================================
 
       madeMenu += `
-╭━━━━━━━━━━━━━━━━━━━━╮
-┃ 📢 *NEWSLETTER*
-┃
-┃ 𝐇𝐀𝐍𝐒 𝐁𝐘𝐓𝐄 𝐌𝐃
-╰━━━━━━━━━━━━━━━━━━━━╯
 
-✧⋄⋆⋅⋆⋄✧⋄⋆⋅⋆⋄✧⋄⋆⋅⋆⋄✧
-       *HANS BYTE MD*
-✧⋄⋆⋅⋆⋄✧⋄⋆⋅⋆⋄✧⋄⋆⋅⋆⋄✧
+╭━━━〔 📢 𝐍𝐄𝐖𝐒𝐋𝐄𝐓𝐓𝐄𝐑 〕━━━╮
+┃
+┃        ✦ 𝐃𝐈𝐋𝐀 𝐌𝐃 ✦
+┃
+┃   🚀 *Stay Connected With Us*
+┃   💫 *Updates • Features • News*
+┃
+╰━━━━━━━━━━━━━━━━━━━━━━╯
+
+        👑 𝐃 𝐈 𝐋 𝐀  𝐌 𝐃 👑
+
+╰┈➤ ⚡ *POWERED BY DILA MD* ⚡
+
 `;
 
 
@@ -151,7 +157,7 @@ cmd(
             "120363292876277898@newsletter",
 
           newsletterName:
-            "𝐇𝐀𝐍𝐒 𝐁𝐘𝐓𝐄 𝐌𝐃",
+            "DiLA 𝐌𝐃",
 
           serverMessageId: 143,
         },
@@ -167,7 +173,7 @@ cmd(
         {
           image: {
             url:
-              "https://i.ibb.co/6Rxhg321/Chat-GPT-Image-Mar-30-2025-03-39-42-AM.png",
+              "https://i.ibb.co/6JrfGTrG/temp-image.jpg",
           },
 
           caption: madeMenu,
