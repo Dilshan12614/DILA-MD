@@ -67,7 +67,7 @@ cmd(
 
       let madeMenu = `
 
-╭━━━〔 🚀 DILA 𝐌𝐃 〕━━━╮
+╭━━━〔 🚀DILA 𝐌𝐃🚀〕━━━╮
 ┃
 ┃  ✨ *WELCOME TO DILA MD*
 ┃
@@ -77,7 +77,7 @@ cmd(
 ┃
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 
-╭━━〔 🤖 𝐁𝐎𝐓 𝐈𝐍𝐅𝐎 〕━━━╮
+╭━━〔 🤖𝐁𝐎𝐓 𝐈𝐍𝐅𝐎🤖 〕━━━╮
 ┃
 ┃  👋 Hello, *${pushname || "User"}*
 ┃  📚 Commands : *${commands.length}*
@@ -131,8 +131,7 @@ cmd(
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 
         
-
-> ╰┈➤  ⚡*POWERED BY DILA MD*⚡
+> ⚡*POWERED BY DILA MD*⚡
 
 `;
 
