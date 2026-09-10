@@ -130,9 +130,9 @@ cmd(
 ┃
 ╰━━━━━━━━━━━━━━━━━━━━━━╯
 
-        👑 𝐃 𝐈 𝐋 𝐀  𝐌 𝐃 👑
+        
 
-╰┈➤ ⚡ *POWERED BY DILA MD* ⚡
+╰┈➤ > ⚡*POWERED BY DILA MD*⚡
 
 `;
 
