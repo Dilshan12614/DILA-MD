@@ -15,49 +15,45 @@ cmd({
 },
 async (conn, mek, m, { from }) => {
     try {
-        const ownerNumber = config.OWNER_NUM;
-        const ownerName = config.OWNER_NAME;
+        const ownerNumber = config.OWNER_NUM || "94740534738"; // fallback number
+        const ownerName = config.OWNER_NAME || "HANS TECH";
+        const ownerEmail = config.OWNER_EMAIL || "hans.tech@gmail.com"; // email එකත් add කරා
 
-        // Use CRLF line breaks for vCard formatting
+        const cleanNumber = ownerNumber.replace(/[^0-9]/g, ''); // + අයින් කරන safe method
+
         const vcard = `BEGIN:VCARD
 VERSION:3.0
-FN:237696900612
-N:HANS;TECH;;;
+FN:${ownerName}
+N:${ownerName};;;
 ORG:Hans Tech
 TITLE:Founder & Developer
-TEL;TYPE=CELL,VOICE;waid=${ownerNumber.replace('+', '')}:${ownerNumber}
+TEL;TYPE=CELL,VOICE;waid=${cleanNumber}:${ownerNumber}
 EMAIL:${ownerEmail}
 URL:https://hans-byte-pair.onrender.com
 NOTE:This is the official contact card of HANS TECH
 END:VCARD
 `;
-        console.log("[DEBUG] Generated vCard:", vcard);
-
-        // Send the vCard as a contact message
-        console.log("[INFO] Sending vCard contact...");
+        
         await conn.sendMessage(from, {
             contacts: {
                 displayName: ownerName,
                 contacts: [{ vcard }]
             }
         }, { quoted: mek });
-        console.log("[INFO] vCard sent successfully.");
 
-        // Send the owner contact message with image
-        console.log("[INFO] Sending image message with owner details...");
         await conn.sendMessage(from, {
             image: { url: 'https://i.ibb.co/PS5DZdJ/Chat-GPT-Image-Mar-30-2025-12-53-39-PM.png' },
             caption: `╭━━〔 *HANS BYTE* 〕━━┈⊷
 ┃◈╭─────────────·๏
 ┃◈┃• *Here is the owner details*
-┃◈┃• *Name* - HANS TECH
-┃◈┃• *Number* 237696900612
-┃◈┃• *Version*: ${config.VERSION}
+┃◈┃• *Name* - ${ownerName}
+┃◈┃• *Number* ${ownerNumber}
+┃◈┃• *Version*: ${config.VERSION || "1.0.0"}
 ┃◈└───────────┈⊷
 ╰──────────────┈⊷
 > © *HANS BYTE MD*`,
             contextInfo: {
-                mentionedJid: [`${ownerNumber.replace('+', '')}@s.whatsapp.net`],
+                mentionedJid: [`${cleanNumber}@s.whatsapp.net`],
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
@@ -67,18 +63,13 @@ END:VCARD
                 }
             }
         }, { quoted: mek });
-        console.log("[INFO] Image message sent successfully.");
 
-        // Check and send the audio file
-        console.log("[INFO] Checking for audio file at:", audioPath);
         if (fs.existsSync(audioPath)) {
-            console.log("[INFO] Audio file found. Sending audio message...");
             await conn.sendMessage(from, {
                 audio: fs.readFileSync(audioPath),
                 mimetype: 'audio/mp4',
                 ptt: true
             }, { quoted: mek });
-            console.log("[INFO] Audio message sent successfully.");
         } else {
             console.warn("[WARN] Audio file not found:", audioPath);
         }
