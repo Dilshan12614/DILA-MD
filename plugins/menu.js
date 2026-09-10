@@ -7,63 +7,48 @@ cmd(
     category: "main",
     filename: __filename,
   },
-  async (danuwa, mek, m, { from, reply }) => {
+  async (
+    danuwa,
+    mek,
+    m,
+    {
+      from,
+      reply
+    }
+  ) => {
     try {
       const categories = {};
 
-      // commands object එකෙන් commands ගන්න
-      for (const cmdName in commands) {
+      for (let cmdName in commands) {
         const cmdData = commands[cmdName];
-
-        const cat = (cmdData.category || "other").toLowerCase();
-
-        if (!categories[cat]) {
-          categories[cat] = [];
-        }
-
+        const cat = cmdData.category?.toLowerCase() || "other";
+        if (!categories[cat]) categories[cat] = [];
         categories[cat].push({
-          pattern: cmdData.pattern || cmdName,
+          pattern: cmdData.pattern,
           desc: cmdData.desc || "No description"
         });
       }
 
-      // Newsletter details
-      const newsletterName = "DILA-MD NEWS";
-      const newsletterJid = "120363XXXXXXXXXXXX@newsletter";
-
-      let menuText = `
-╭━━━〔 *DILA-MD* 〕━━━╮
-┃ 📢 *Newsletter:* ${newsletterName}
-┃ 🆔 *JID:* ${newsletterJid}
-╰━━━━━━━━━━━━━━━━━━╯
-
-📋 *AVAILABLE COMMANDS*
-`;
+      let menuText = "📋 *Available Commands:*\n";
 
       for (const [cat, cmds] of Object.entries(categories)) {
         menuText += `\n📂 *${cat.toUpperCase()}*\n`;
-
-        for (const c of cmds) {
-          menuText += `┃ • .${c.pattern} - ${c.desc}\n`;
-        }
+        cmds.forEach(c => {
+          menuText += `- .${c.pattern} : ${c.desc}\n`;
+        });
       }
 
       await danuwa.sendMessage(
-        from,
-        {
-          image: {
-            url: "https://n.uguu.se/PbeEXJzq.jpg"
-          },
-          caption: menuText.trim()
-        },
-        {
-          quoted: mek
-        }
-      );
-
+  from,
+  {
+    image: { url: "https://n.uguu.se/PbeEXJzq.jpg" },
+    caption: menuText.trim()
+  },
+  { quoted: mek }
+);
     } catch (err) {
-      console.error("MENU ERROR:", err);
-      reply("❌ Error generating menu.\n\n" + err.message);
+      console.error(err);
+      reply("❌ Error generating menu.");
     }
   }
 );
