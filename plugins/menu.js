@@ -69,7 +69,7 @@ cmd(
 
 ╭━━━〔 🚀DILA 𝐌𝐃🚀〕━━━╮
 ┃
-┃  ✨ *WELCOME TO DILA MD*
+┃  ✨ *WELCOME TO DILA MD* ✨
 ┃
 ┃  🤖 Your Personal WhatsApp Assistant
 ┃  ⚡ Fast • Smart • Powerful
@@ -128,7 +128,7 @@ cmd(
 ┃   🚀 *Stay Connected With Us*
 ┃   💫 *Updates • Features • News*
 ┃
-╰━━━━━━━━━━━━━━━━━━━━━━╯
+╰━━━━━━━━━━━━━━━━━━━━━━
 
         
 > ⚡*POWERED BY DILA MD*⚡
