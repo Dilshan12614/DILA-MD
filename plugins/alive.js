@@ -12,21 +12,127 @@ cmd({
 },
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        // Generate system status message
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // STEP 1 - START LOADING
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        const loading = await conn.sendMessage(from, {
+            text: `╭━━〔 *DARK-SHADOW-MD* 〕━━┈⊷
+┃
+┃  ⏳ *Loading System...*
+┃
+┃  ▱▱▱▱▱▱▱▱▱▱ 0%
+┃
+┃  Please wait...
+┃
+╰━━━━━━━━━━━━━━━━━━━`
+        }, { quoted: mek });
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // STEP 2 - UPTIME
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        await conn.sendMessage(from, {
+            text: `╭━━〔 *DARK-SHADOW-MD* 〕━━┈⊷
+┃
+┃  ⏳ *Loading Uptime...*
+┃
+┃  ▰▰▱▱▱▱▱▱▱▱ 20%
+┃
+┃  • Uptime: Loading...
+┃
+╰━━━━━━━━━━━━━━━━━━━`,
+            edit: loading.key
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const uptime = runtime(process.uptime());
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // STEP 3 - RAM
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        await conn.sendMessage(from, {
+            text: `╭━━〔 *DARK-SHADOW-MD* 〕━━┈⊷
+┃
+┃  📟 *Loading RAM Usage...*
+┃
+┃  ▰▰▰▰▱▱▱▱▱▱ 40%
+┃
+┃  • Uptime: ${uptime}
+┃  • RAM: Loading...
+┃
+╰━━━━━━━━━━━━━━━━━━━`,
+            edit: loading.key
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const ram = `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${(os.totalmem() / 1024 / 1024).toFixed(2)}MB`;
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // STEP 4 - HOSTNAME
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        await conn.sendMessage(from, {
+            text: `╭━━〔 *DARK-SHADOW-MD* 〕━━┈⊷
+┃
+┃  ⚙️ *Loading HostName...*
+┃
+┃  ▰▰▰▰▰▰▱▱▱▱ 60%
+┃
+┃  • Uptime: ${uptime}
+┃  • RAM: ${ram}
+┃  • HostName: Loading...
+┃
+╰━━━━━━━━━━━━━━━━━━━`,
+            edit: loading.key
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const hostname = os.hostname();
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // STEP 5 - OWNER
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        await conn.sendMessage(from, {
+            text: `╭━━〔 *DARK-SHADOW-MD* 〕━━┈⊷
+┃
+┃  👨‍💻 *Loading Owner...*
+┃
+┃  ▰▰▰▰▰▰▰▰▱▱ 80%
+┃
+┃  • Uptime: ${uptime}
+┃  • RAM: ${ram}
+┃  • HostName: ${hostname}
+┃  • Owner: Loading...
+┃
+╰━━━━━━━━━━━━━━━━━━━`,
+            edit: loading.key
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // STEP 6 - FINAL
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         const status = `╭━━〔 *DARK-SHADOW-MD* 〕━━┈⊷
 ┃◈╭────────────
-┃◈┃• *⏳Uptime*:  ${runtime(process.uptime())} 
-┃◈┃• *📟 Ram usage*: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${(os.totalmem() / 1024 / 1024).toFixed(2)}MB
-┃◈┃• *⚙️ HostName*: ${os.hostname()}
+┃◈┃• *⏳ Uptime*: ${uptime}
+┃◈┃• *📟 Ram usage*: ${ram}
+┃◈┃• *⚙️ HostName*: ${hostname}
 ┃◈┃• *👨‍💻 Owner*: DARK SHADOW.
 ┃◈┃• *🧬 Version*: 3.0.0 BETA
 ┃◈└───────────
 ╰──────────────
 > © ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅᴀʀᴋ ꜱʜᴀᴅᴏᴡ`;
 
-        // Send the status message with an image
-        await conn.sendMessage(from, { 
-            image: { url: `https://i.ibb.co/5XJdT7zS/6691.jpg` },  // Image URL
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // SEND FINAL IMAGE
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        await conn.sendMessage(from, {
+            image: { url: `https://i.ibb.co/5XJdT7zS/6691.jpg` },
             caption: status,
             contextInfo: {
                 mentionedJid: [m.sender],
@@ -40,8 +146,17 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
             }
         }, { quoted: mek });
 
+        // Delete loading message
+        try {
+            await conn.sendMessage(from, {
+                delete: loading.key
+            });
+        } catch (err) {
+            console.log("Loading message delete failed");
+        }
+
     } catch (e) {
         console.error("Error in alive command:", e);
-        reply(`An error occurred: ${e.message}`);
+        reply(`❌ An error occurred: ${e.message}`);
     }
 });
