@@ -7,63 +7,63 @@ cmd(
     category: "main",
     filename: __filename,
   },
-  async (
-    danuwa,
-    mek,
-    m,
-    {
-      from,
-      reply
-    }
-  ) => {
+  async (danuwa, mek, m, { from, reply }) => {
     try {
       const categories = {};
 
-      for (let cmdName in commands) {
+      // commands object එකෙන් commands ගන්න
+      for (const cmdName in commands) {
         const cmdData = commands[cmdName];
-        const cat = cmdData.category?.toLowerCase() || "other";
 
-        if (!categories[cat]) categories[cat] = [];
+        const cat = (cmdData.category || "other").toLowerCase();
+
+        if (!categories[cat]) {
+          categories[cat] = [];
+        }
 
         categories[cat].push({
-          pattern: cmdData.pattern,
+          pattern: cmdData.pattern || cmdName,
           desc: cmdData.desc || "No description"
         });
       }
 
-      // ==============================
-      // NEWSLETTER DETAILS
-      // ==============================
+      // Newsletter details
       const newsletterName = "DILA-MD NEWS";
       const newsletterJid = "120363XXXXXXXXXXXX@newsletter";
 
-      let menuText =
-        `╭━━━〔 *DILA-MD* 〕━━━╮\n` +
-        `┃ 📢 *Newsletter:* ${newsletterName}\n` +
-        `┃ 🆔 *JID:* ${newsletterJid}\n` +
-        `╰━━━━━━━━━━━━━━━━━━╯\n\n` +
-        `📋 *Available Commands:*\n`;
+      let menuText = `
+╭━━━〔 *DILA-MD* 〕━━━╮
+┃ 📢 *Newsletter:* ${newsletterName}
+┃ 🆔 *JID:* ${newsletterJid}
+╰━━━━━━━━━━━━━━━━━━╯
+
+📋 *AVAILABLE COMMANDS*
+`;
 
       for (const [cat, cmds] of Object.entries(categories)) {
         menuText += `\n📂 *${cat.toUpperCase()}*\n`;
 
-        cmds.forEach(c => {
-          menuText += `- .${c.pattern} : ${c.desc}\n`;
-        });
+        for (const c of cmds) {
+          menuText += `┃ • .${c.pattern} - ${c.desc}\n`;
+        }
       }
 
       await danuwa.sendMessage(
         from,
         {
-          image: { url: "https://n.uguu.se/PbeEXJzq.jpg" },
+          image: {
+            url: "https://n.uguu.se/PbeEXJzq.jpg"
+          },
           caption: menuText.trim()
         },
-        { quoted: mek }
+        {
+          quoted: mek
+        }
       );
 
     } catch (err) {
-      console.error(err);
-      reply("❌ Error generating menu.");
+      console.error("MENU ERROR:", err);
+      reply("❌ Error generating menu.\n\n" + err.message);
     }
   }
 );
