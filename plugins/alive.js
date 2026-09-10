@@ -17,7 +17,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // STEP 1 - START LOADING
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         const loading = await conn.sendMessage(from, {
-            text: `╭━━〔 *DARK-SHADOW-MD* 〕━━┈⊷
+            text: `╭━━〔 *DILA-MD* 〕━━┈⊷
 ┃
 ┃  ⏳ *Loading System...*
 ┃
@@ -34,7 +34,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // STEP 2 - UPTIME
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         await conn.sendMessage(from, {
-            text: `╭━━〔 *DARK-SHADOW-MD* 〕━━┈⊷
+            text: `╭━━〔 *DILA-MD* 〕━━┈⊷
 ┃
 ┃  ⏳ *Loading Uptime...*
 ┃
@@ -54,7 +54,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // STEP 3 - RAM
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         await conn.sendMessage(from, {
-            text: `╭━━〔 *DARK-SHADOW-MD* 〕━━┈⊷
+            text: `╭━━〔 *DILA-MD* 〕━━┈⊷
 ┃
 ┃  📟 *Loading RAM Usage...*
 ┃
@@ -75,7 +75,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // STEP 4 - HOSTNAME
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         await conn.sendMessage(from, {
-            text: `╭━━〔 *DARK-SHADOW-MD* 〕━━┈⊷
+            text: `╭━━〔 *DILA-MD* 〕━━┈⊷
 ┃
 ┃  ⚙️ *Loading HostName...*
 ┃
@@ -97,7 +97,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // STEP 5 - OWNER
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         await conn.sendMessage(from, {
-            text: `╭━━〔 *DARK-SHADOW-MD* 〕━━┈⊷
+            text: `╭━━〔 *DILA-MD* 〕━━┈⊷
 ┃
 ┃  👨‍💻 *Loading Owner...*
 ┃
@@ -117,22 +117,23 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         // STEP 6 - FINAL
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        const status = `╭━━〔 *DARK-SHADOW-MD* 〕━━┈⊷
+        const status = `╭━━〔 *DILA-MD* 〕━━┈⊷
 ┃◈╭────────────
 ┃◈┃• *⏳ Uptime*: ${uptime}
 ┃◈┃• *📟 Ram usage*: ${ram}
 ┃◈┃• *⚙️ HostName*: ${hostname}
-┃◈┃• *👨‍💻 Owner*: DARK SHADOW.
+┃◈┃• *👨‍💻 Owner*: DILA-MD
 ┃◈┃• *🧬 Version*: 3.0.0 BETA
 ┃◈└───────────
 ╰──────────────
-> © ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅᴀʀᴋ ꜱʜᴀᴅᴏᴡ`;
+
+> ✦ POWERED BY DILA MD`;
 
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         // SEND FINAL IMAGE
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         await conn.sendMessage(from, {
-            image: { url: `https://i.ibb.co/5XJdT7zS/6691.jpg` },
+            image: { url: `https://i.ibb.co/gXHVbhm/temp-image.jpg` },
             caption: status,
             contextInfo: {
                 mentionedJid: [m.sender],
@@ -140,7 +141,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
                     newsletterJid: '120363409414874042@newsletter',
-                    newsletterName: 'DARK-SHADOW',
+                    newsletterName: 'DILA MD',
                     serverMessageId: 143
                 }
             }
