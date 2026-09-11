@@ -1,206 +1,107 @@
 const { cmd } = require('../command');
 const yts = require('yt-search');
-const fetch = require('node-fetch');
-
-// Newsletter context config
-const newsletterContext = {
-    mentionedJid: [],
-    forwardingScore: 1000,
-    isForwarded: true,
-    forwardedNewsletterMessageInfo: {
-        newsletterJid: '120363292876277898@newsletter',
-        newsletterName: "𝐇𝐀𝐍𝐒 𝐁𝐘𝐓𝐄 𝐌𝐃",
-        serverMessageId: 143,
-    }
-};
+const axios = require('axios');
 
 cmd({
-    pattern: "play",
-    alias: ['ytsong', 'song'],
-    react: "🎵",
-    desc: "Download audio from YouTube",
+    pattern: "song",
+    alias: ["play", "music"],
+    desc: "Download YouTube song as audio",
     category: "download",
+    react: "🎵",
     filename: __filename
 },
-async (conn, mek, m, { from, q, reply, sender }) => {
-    if (!q) return reply("*❌ Please provide a song title or YouTube URL*");
-
+async (conn, mek, m, {
+    from,
+    q,
+    reply
+}) => {
     try {
-        const search = await yts(q);
-        const video = search.videos[0];
-        if (!video) return reply("*❌ No results found*");
+        if (!q) {
+            return reply(
+`🎵 *DILA-MD SONG*
 
-        const messageContext = {
-            ...newsletterContext,
-            mentionedJid: [sender]
-        };
+Usage:
+.song <song name>
 
-        const infoMsg = `
-╔═══〘 🎧 𝙈𝙋𝟛 𝘿𝙇 〙═══╗
-
-⫸ 🎵 *Title:* ${video.title}
-⫸ 👤 *Channel:* ${video.author.name}
-⫸ ⏱️ *Duration:* ${video.timestamp}
-⫸ 👁️ *Views:* ${video.views.toLocaleString()} views
-
-╚══ ⸨ 𝙃𝘼𝙉𝙎 𝘽𝙔𝙏𝙀 𝙈𝘿 ⸩ ═══╝`.trim();
-
-        await conn.sendMessage(from, {
-            image: { url: video.thumbnail },
-            caption: infoMsg,
-            contextInfo: messageContext
-        }, { quoted: mek });
-
-        // New API Call
-        const api = `https://itzpire.com/download/youtube/v2?url=${encodeURIComponent(video.url)}`;
-        const res = await fetch(api);
-        const json = await res.json();
-
-        if (!json.status || json.status !== 'success' || !json.data?.downloadUrl) {
-            return reply("*❌ Failed to get audio download link*");
+Example:
+.song Alan Walker Faded`
+            );
         }
+
+        await reply("🔎 Searching for your song...");
+
+        // YouTube search
+        const search = await yts(q);
+
+        if (!search.videos || search.videos.length === 0) {
+            return reply("❌ Song එක හොයාගන්න බැරි වුණා.");
+        }
+
+        const video = search.videos[0];
 
         const title = video.title;
+        const url = video.url;
+        const thumbnail = video.thumbnail;
 
-        // Send MP3 as audio message
-        await conn.sendMessage(from, {
-            audio: { url: json.data.downloadUrl },
-            mimetype: 'audio/mp4',
-            fileName: `${title}.mp3`,
-            ptt: false,
-            contextInfo: messageContext
-        }, { quoted: mek });
+        await reply(
+`🎵 *DILA-MD SONG*
 
-        // Send as document too
-        await conn.sendMessage(from, {
-            document: { url: json.data.downloadUrl },
-            mimetype: 'audio/mp4',
-            fileName: `${title}.mp3`,
-            caption: "*📁 HANS BYTE MD*",
-            contextInfo: messageContext
-        }, { quoted: mek });
+📌 *Title:* ${title}
+⏱️ *Duration:* ${video.timestamp}
+👤 *Channel:* ${video.author.name}
 
-    } catch (err) {
-        console.error("Audio Error:", err);
-        return reply(`*❌ Error:* ${err.message}`);
-    }
-});
+⬇️ Downloading audio...`
+        );
 
-// Command to download audio from YouTube URL
+        /*
+         * Replace this API URL with your working
+         * YouTube audio API if your current API changes.
+         */
+        const api = `https://api.vreden.my.id/api/ytmp3?url=${encodeURIComponent(url)}`;
 
-cmd({
-    pattern: "ytmp3",
-    alias: ['yturlmp3'],
-    react: "🎧",
-    desc: "Download audio from a YouTube URL",
-    category: "download",
-    filename: __filename
-},
-async (conn, mek, m, { from, q, reply, sender }) => {
-    if (!q || !q.includes("youtube.com/watch?v=")) {
-        return reply("*❌ Please provide a valid YouTube video URL*");
-    }
+        const response = await axios.get(api);
 
-    try {
-        const api = `https://itzpire.com/download/youtube/v2?url=${encodeURIComponent(q)}`;
-        const res = await fetch(api);
-        const data = await res.json();
-
-        if (!data.status || !data.data?.downloadUrl) {
-            return reply("*❌ Failed to retrieve MP3 link*");
+        if (!response.data || !response.data.result) {
+            return reply("❌ Audio download failed.");
         }
 
-        const messageContext = {
-            ...newsletterContext,
-            mentionedJid: [sender]
-        };
+        const result = response.data.result;
 
-        const infoMsg = `
-╔═━「 🎧 𝙔𝙏𝙈𝙋𝟛 𝘿𝙊𝙒𝙉𝙇𝙊𝘼𝘿 」━═╗
+        const audioUrl =
+            result.download ||
+            result.url ||
+            result.download_url;
 
-⫸ 📌 *Title:* ${data.data.title}
-⫸ 📁 *Format:* MP3
-⫸ 🛰️ *Source:* YouTube
-
-╚═━「 𝙃𝘼𝙉𝙎 𝘽𝙔𝙏𝙀 𝙈𝘿 」━═╝
-`.trim();
+        if (!audioUrl) {
+            return reply("❌ Audio URL එක ලැබුණේ නැහැ.");
+        }
 
         await conn.sendMessage(from, {
-            image: { url: data.data.image },
-            caption: infoMsg,
-            contextInfo: messageContext
-        }, { quoted: mek });
+            audio: {
+                url: audioUrl
+            },
+            mimetype: "audio/mpeg",
+            fileName: `${title}.mp3`,
+            contextInfo: {
+                externalAdReply: {
+                    title: title,
+                    body: "🎵 DILA-MD",
+                    thumbnailUrl: thumbnail,
+                    sourceUrl: url,
+                    mediaType: 1,
+                    renderLargerThumbnail: true
+                }
+            }
+        }, {
+            quoted: mek
+        });
 
-        // Send as audio
-        await conn.sendMessage(from, {
-            audio: { url: data.data.downloadUrl },
-            mimetype: 'audio/mp4',
-            fileName: `${data.data.title}.mp3`,
-            ptt: false,
-            contextInfo: messageContext
-        }, { quoted: mek });
+    } catch (error) {
+        console.error("SONG PLUGIN ERROR:", error);
+        return reply(
+`❌ *Song Download Error*
 
-        // ✅ Also send as document
-        await conn.sendMessage(from, {
-            document: { url: data.data.downloadUrl },
-            mimetype: 'audio/mp4',
-            fileName: `${data.data.title}.mp3`,
-            caption: "*📁 HANS BYTE MD*",
-            contextInfo: messageContext
-        }, { quoted: mek });
-
-    } catch (err) {
-        console.error("YTMP3 Error:", err);
-        return reply(`*❌ Error:* ${err.message}`);
-    }
-});
-
-
-
-
-cmd({
-    pattern: "yts",
-    alias: ['ytsearch'],
-    react: "🎧",
-    desc: "Search YouTube for a video",
-    category: "search",
-    filename: __filename
-},
-async (conn, mek, m, { from, q, reply, sender }) => {
-    if (!q) return reply("*❌ Please provide a song title or keywords for search*");
-
-    try {
-        // Search YouTube using yt-search
-        const search = await yts(q);
-        const video = search.videos[0];
-        if (!video) return reply("*❌ No results found*");
-
-        // Prepare message context
-        const messageContext = {
-            ...newsletterContext,
-            mentionedJid: [sender]
-        };
-
-        const infoMsg = `
-╔═━「 🔍 𝙔𝙏 𝙎𝙀𝘼𝙍𝘾𝙃 」━═╗
-
-⫸ 📌 *Title:* ${video.title}
-⫸ 👤 *Channel:* ${video.author.name}
-⫸ ⏱️ *Duration:* ${video.timestamp}
-⫸ 👁️ *Views:* ${video.views.toLocaleString()}
-⫸ 🔗 *Link:* ${video.url}
-
-╚═━「 💡 𝙃𝘼𝙉𝙎 𝘽𝙔𝙏𝙀 𝙈𝘿 」━═╝`.trim();
-
-        // Send the search result details back to the user
-        await conn.sendMessage(from, {
-            image: { url: video.thumbnail },
-            caption: infoMsg,
-            contextInfo: messageContext
-        }, { quoted: mek });
-
-    } catch (err) {
-        console.error("YTB Search Error:", err);
-        return reply(`*❌ Error:* ${err.message}`);
+${error.message || "Unknown error"}`
+        );
     }
 });
