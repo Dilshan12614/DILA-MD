@@ -59,7 +59,7 @@ END:VCARD
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363292876277898@newsletter',
+                    newsletterJid: '120363429118791328@newsletter',
                     newsletterName: "DILA MD",
                     serverMessageId: 143
                 }
