@@ -72,7 +72,7 @@ cmd({
     // Send the image and URL as a reply
     await _0x2a615f.sendMessage(_0x462e92, {
       'image': { url: "https://i.ibb.co/zhhzCLcR/temp-image.jpg" },
-      'caption': `*Image Uploaded Successfully 📸*\nSize: ${_0x227cf8.length} Byte(s)\n*URL:* ${_0x2b12b1}\n\n> ⚖️ Uploaded via 𝐇𝐀𝐍𝐒 𝐁𝐘𝐓𝐄 𝐌𝐃`,
+      'caption': `*Image Uploaded Successfully 📸*\nSize: ${_0x227cf8.length} Byte(s)\n*URL:* ${_0x2b12b1}\n\n> ⚖️ Uploaded via DiLA MD`,
       'contextInfo': _0x273817
     });
 
