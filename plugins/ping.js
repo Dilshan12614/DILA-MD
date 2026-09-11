@@ -1,77 +1,59 @@
-const config = require('../config');
-const { cmd, commands } = require('../command');
+const { cmd } = require('../command');
+const os = require('os');
 
 cmd({
     pattern: "ping",
-    alias: ["speed","pong"],use: '.ping',
-    desc: "Check bot's response time.",
+    alias: ["speed", "pong"],
+    desc: "Check bot response speed",
     category: "main",
-    react: "⚡",
+    react: "🏓",
     filename: __filename
 },
-async (conn, mek, m, { from, quoted, sender, reply }) => {
+async (conn, mek, m, { from, reply }) => {
+
     try {
-        const start = new Date().getTime();
 
-        const reactionEmojis = ['🔥', '⚡', '🚀', '💨', '🎯', '🎉', '🌟', '💥', '🕐', '🔹'];
-        const textEmojis = ['💎', '🏆', '⚡️', '🚀', '🎶', '🌠', '🌀', '🔱', '🛡️', '✨'];
+        const start = Date.now();
 
-        const reactionEmoji = reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
-        let textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
+        const newsletterJid = '120363429118791328@newsletter';
+        const newsletterName = 'DILA MD';
 
-        // Ensure reaction and text emojis are different
-        while (textEmoji === reactionEmoji) {
-            textEmoji = textEmojis[Math.floor(Math.random() * textEmojis.length)];
-        }
-
-        // Send reaction using conn.sendMessage()
-        await conn.sendMessage(from, {
-            react: { text: textEmoji, key: mek.key }
+        // First message
+        const sent = await conn.sendMessage(from, {
+            text: `⏳ *Checking speed...*`
         });
 
-        const end = new Date().getTime();
-        const responseTime = (end - start) / 1000;
+        const ping = Date.now() - start;
 
-        const text = `> *DiLA-MD SPEED: ${responseTime.toFixed(2)}ms ${reactionEmoji}*`;
-
+        // Final result
         await conn.sendMessage(from, {
-            text,
+            text:
+`╭━━━〔 🏓 *DILA MD PING* 〕━━━╮
+┃
+┃ ⚡ *Speed:* ${ping} ms
+┃ 🚀 *Status:* Online
+┃ 📢 *Newsletter:* ${newsletterName}
+┃
+╰━━━━━━━━━━━━━━━━━━━━━━╯`,
             contextInfo: {
-                mentionedJid: [sender],
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363429118791328@newsletter',
-                    newsletterName: "DiLA MD",
-                    serverMessageId: 143
+                    newsletterJid: newsletterJid,
+                    newsletterName: newsletterName
                 }
             }
-        }, { quoted: mek });
+        });
+
+        // Delete checking message
+        try {
+            await conn.sendMessage(from, {
+                delete: sent.key
+            });
+        } catch (e) {}
 
     } catch (e) {
-        console.error("Error in ping command:", e);
-        reply(`An error occurred: ${e.message}`);
+        console.log("Ping Error:", e);
+        reply("❌ Ping error: " + e.message);
     }
 });
-
-// ping2 
-
-cmd({
-    pattern: "ping2",
-    desc: "Check bot's response time.",
-    category: "main",
-    react: "🍂",
-    filename: __filename
-},
-async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
-    try {
-        const startTime = Date.now()
-        const message = await conn.sendMessage(from, { text: '*PINGING...*' })
-        const endTime = Date.now()
-        const ping = endTime - startTime
-        await conn.sendMessage(from, { text: `*DiLA-MD SPEED : ${ping}ms*` }, { quoted: message })
-    } catch (e) {
-        console.log(e)
-        reply(`${e}`)
-    }
-})
