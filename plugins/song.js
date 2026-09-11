@@ -1,6 +1,30 @@
 const { cmd } = require('../command');
 const yts = require('yt-search');
-const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+const { execFile } = require('child_process');
+
+const TEMP_DIR = path.join(__dirname, '../temp');
+
+if (!fs.existsSync(TEMP_DIR)) {
+    fs.mkdirSync(TEMP_DIR, { recursive: true });
+}
+
+function runYtDlp(args) {
+    return new Promise((resolve, reject) => {
+        execFile('yt-dlp', args, {
+            timeout: 180000,
+            maxBuffer: 1024 * 1024 * 10
+        }, (error, stdout, stderr) => {
+            if (error) {
+                console.error('yt-dlp error:', stderr);
+                return reject(error);
+            }
+
+            resolve(stdout);
+        });
+    });
+}
 
 cmd({
     pattern: "song",
@@ -15,24 +39,30 @@ async (conn, mek, m, {
     q,
     reply
 }) => {
+
+    let outputFile = null;
+
     try {
+
         if (!q) {
             return reply(
 `🎵 *DILA-MD SONG*
 
-Usage:
-.song <song name>
-
-Example:
-.song Alan Walker Faded`
+╭━━━━━━━━━━━━━━━━━━╮
+┃ 🎧 *Usage*
+┃ .song <song name>
+┃
+┃ 🎵 *Example*
+┃ .song Alan Walker Faded
+╰━━━━━━━━━━━━━━━━━━╯`
             );
         }
 
-        await reply("🔎 *Searching for your song...*");
+        await reply("🔎 *Searching YouTube...*");
 
         const search = await yts(q);
 
-        if (!search.videos || search.videos.length === 0) {
+        if (!search.videos || !search.videos.length) {
             return reply("❌ Song එක හොයාගන්න බැරි වුණා.");
         }
 
@@ -40,69 +70,67 @@ Example:
 
         const title = video.title;
         const url = video.url;
-        const thumbnail = video.thumbnail;
+        const safeTitle = title
+            .replace(/[\\/:*?"<>|]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .slice(0, 80);
+
+        outputFile = path.join(
+            TEMP_DIR,
+            `${Date.now()}-${safeTitle}.mp3`
+        );
 
         await reply(
 `🎵 *DILA-MD SONG*
 
 ╭━━━━━━━━━━━━━━━━━━╮
-┃ 🎶 *TITLE:* ${title}
-┃ ⏱️ *DURATION:* ${video.timestamp}
-┃ 👤 *CHANNEL:* ${video.author.name}
+┃ 🎶 *Title:* ${title}
+┃ ⏱️ *Duration:* ${video.timestamp}
+┃ 👤 *Channel:* ${video.author.name}
 ╰━━━━━━━━━━━━━━━━━━╯
 
 ⬇️ *Downloading audio...*`
         );
 
         /*
-         * YouTube Audio API
-         * Vreden API removed
+         * yt-dlp downloads the audio directly.
+         * No Vreden API required.
          */
 
-        // YouTube MP3 conversion
-        const response = await axios.post(
-            "https://ytmp3.ge/api/convert",
-            new URLSearchParams({
-                youtube_url: url,
-                quality: "192"
-            }).toString(),
-            {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                timeout: 120000
-            }
-        );
+        await runYtDlp([
+            '--no-playlist',
+            '--extract-audio',
+            '--audio-format', 'mp3',
+            '--audio-quality', '192K',
+            '--no-warnings',
+            '--quiet',
+            '-o', outputFile,
+            url
+        ]);
 
-        const data = response.data;
-
-        console.log("YTMP3 API RESPONSE:", data);
-
-        if (!data || data.success !== true) {
-            throw new Error(
-                data?.error || "YouTube conversion failed"
-            );
+        if (!fs.existsSync(outputFile)) {
+            throw new Error("MP3 file was not created.");
         }
 
-        const audioUrl = data.downloadUrl;
+        const stats = fs.statSync(outputFile);
 
-        if (!audioUrl) {
-            throw new Error("Audio download URL not found");
+        if (stats.size === 0) {
+            throw new Error("Downloaded MP3 is empty.");
         }
+
+        await reply("📤 *Sending audio...*");
 
         await conn.sendMessage(
             from,
             {
-                audio: {
-                    url: audioUrl
-                },
-                mimetype: "audio/mpeg",
-                fileName: `${title.replace(/[\\/:*?"<>|]/g, '')}.mp3`,
+                audio: fs.readFileSync(outputFile),
+                mimetype: 'audio/mpeg',
+                fileName: `${safeTitle}.mp3`,
                 contextInfo: {
                     externalAdReply: {
                         title: title,
-                        body: "🎵 DILA-MD",
-                        thumbnailUrl: thumbnail,
+                        body: '🎵 DILA-MD',
                         sourceUrl: url,
                         mediaType: 1,
                         renderLargerThumbnail: true
@@ -113,3 +141,30 @@ Example:
                 quoted: mek
             }
         );
+
+        /*
+         * Delete temporary file
+         */
+        try {
+            fs.unlinkSync(outputFile);
+        } catch (e) {}
+
+    } catch (error) {
+
+        console.error("SONG PLUGIN ERROR:", error);
+
+        if (outputFile && fs.existsSync(outputFile)) {
+            try {
+                fs.unlinkSync(outputFile);
+            } catch (e) {}
+        }
+
+        return reply(
+`❌ *Song Download Error*
+
+⚠️ ${error.message || "Unknown error"}
+
+💡 Please try another song.`
+        );
+    }
+});
