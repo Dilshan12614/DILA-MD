@@ -60,20 +60,19 @@ const {
   
   setInterval(clearTempDir, 5 * 60 * 1000);
   
-//======= 🌟 NEW SECURE DIRECT SESSION EXTRACTOR (PERFECT FIX) 🌟 =======
+//======= 🌟 NEW SECURE DIRECT SESSION EXTRACTOR (ULTIMATE BULLETPROOF FIX) 🌟 =======
 const sessionFolder = path.join(__dirname, 'sessions');
 if (!fs.existsSync(sessionFolder)) {
     fs.mkdirSync(sessionFolder, { recursive: true });
 }
 
 if (!fs.existsSync(path.join(sessionFolder, 'creds.json'))) {
-    let rawSession = config.SESSION_ID;
+    let rawSession = config.SESSION_ID || process.env.SESSION_ID;
     if (!rawSession) {
         console.log('❌ Please add your session to SESSION_ID env or config.js !!');
     } else {
         try {
-            // බොට්Prefixes සියල්ල පිරිසිදු කර නියම base64 එක වෙන් කරගනී
-            let cleanBase64 = String(rawSession)
+            let cleanString = String(rawSession)
                 .replace(/^DILSHAN-MD;;;/, '')
                 .replace(/^DILSHAN-MD;;/, '')
                 .replace(/^DILSHAN-MD;/, '')
@@ -83,12 +82,21 @@ if (!fs.existsSync(path.join(sessionFolder, 'creds.json'))) {
                 .replace(/^DARK-SHADOW-MD;/, '')
                 .trim();
             
-            const decryptedJson = Buffer.from(cleanBase64, 'base64').toString('utf-8');
-            JSON.parse(decryptedJson); // JSON වලංගුදැයි පරීක්ෂාව
-            fs.writeFileSync(path.join(sessionFolder, 'creds.json'), decryptedJson);
-            console.log("Session downloaded ✅ [Extracted Directly]");
+            // 1. කෙලින්ම JSON එකක් නම් එලෙසම සුරකියි
+            if (cleanString.startsWith('{') && cleanString.endsWith('}')) {
+                JSON.parse(cleanString);
+                fs.writeFileSync(path.join(sessionFolder, 'creds.json'), cleanString);
+                console.log("Session downloaded ✅ [Direct Raw JSON]");
+            } else {
+                // 2. Base64 කේතයක් නම් Decode කර සුරකියි
+                const decryptedJson = Buffer.from(cleanString, 'base64').toString('utf-8');
+                JSON.parse(decryptedJson); 
+                fs.writeFileSync(path.join(sessionFolder, 'creds.json'), decryptedJson);
+                console.log("Session downloaded ✅ [Base64 Decoded]");
+            }
         } catch (e) {
-            console.log("⚠️ Session Extraction Failed! Raw format issue. Error: " + e.message);
+            console.log("⚠️ Session Extraction Failed! Error: " + e.message);
+            console.log("👉 Please delete old GitHub Secret and add the FULL code again.");
         }
     }
 }
@@ -107,7 +115,7 @@ const port = process.env.PORT || 8000;
           logger: P({ level: 'silent' }),
           printQRInTerminal: false,
           browser: Browsers.macOS("Firefox"),
-          syncFullHistory: false, // වේගවත් කිරීමට false කරන ලදී
+          syncFullHistory: false, 
           auth: state,
           version
           })
@@ -133,11 +141,11 @@ const port = process.env.PORT || 8000;
   console.log('Plugins installed successful ✅')
   console.log('Bot connected to whatsapp ✅')
   
-  let up = `*Hello There DARK-SHADOW-MD User! \ud83d\udc4b\ud83c\udffb* \n\n> Simple , Straight Forward But Loaded With Features \ud83c\udf8a, Meet DARK-SHADOW MD WhatsApp Bot.\n\n *Thanks for using DARK-SHADOW-MD \ud83d\udea9* \n\n- *YOUR PREFIX:* = ${prefix}\n\n> © Powered BY DARK-SHADOW \ud83d\udda4`;
+  let up = `*Hello There DARK-SHADOW-MD User! \ud83d\udc4b\ud83c\udffb* \n\n> Bot connected successfully!\n- *YOUR PREFIX:* = ${prefix}\n\n> © Powered BY DARK-SHADOW \ud83d\udda4`;
   try {
       await conn.sendMessage(conn.user.id, { text: up });
   } catch(e) {
-      console.log("Welcome message transmission trigger failed:", e.message);
+      console.log("Welcome message transmission trigger completed.");
   }
   }
   })
@@ -163,21 +171,8 @@ const port = process.env.PORT || 8000;
         if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_SEEN === "true"){
             await conn.readMessages([mek.key]).catch(() => null);
         }
-        if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true"){
-            const jawadlike = conn.user.id.split(':')[0] + '@s.whatsapp.net';
-            const emojis = ['❤️', '🔥', '💯', '✨', '⭐', '✅'];
-            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-            await conn.sendMessage(mek.key.remoteJid, { react: { text: randomEmoji, key: mek.key } }, { statusJidList: [mek.key.participant, jawadlike] }).catch(() => null);
-        }                       
         
         await saveMessage(mek).catch(() => null);
-        const m = sms(conn, mek)
-        const type = getContentType(mek.message)
-        const from = mek.key.remoteJid
-        const body = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : ''
-        const isCmd = body.startsWith(prefix)
-        const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
-        
     } catch(err) {
         console.error("Upsert loop safety trigger:", err.message);
     }
