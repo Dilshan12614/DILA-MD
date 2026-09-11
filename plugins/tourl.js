@@ -63,8 +63,8 @@ cmd({
       'forwardingScore': 0x3e7,
       'isForwarded': true,
       'forwardedNewsletterMessageInfo': {
-        'newsletterJid': '120363292876277898@newsletter',
-        'newsletterName': "𝐇𝐀𝐍𝐒 𝐁𝐘𝐓𝐄 𝐌𝐃",
+        'newsletterJid': '120363429118791328@newsletter',
+        'newsletterName': "DiLA 𝐌𝐃",
         'serverMessageId': 0x8f
       }
     };
