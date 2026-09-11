@@ -1,113 +1,87 @@
-const { cmd } = require('../command');
-const axios = require('axios');
+import makeWASocket from "@whiskeysockets/baileys";
+import fetch from "node-fetch";
 
-// OpenWeather API Key
-const API_KEY = '700f873bdc12c7f9a30469b3803611f9';
+const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY;
 
-cmd({
-    pattern: "weather",
-    alias: ["climate", "temp"],
-    desc: "Get current weather information",
-    category: "main",
-    react: "🌤️",
-    filename: __filename
-},
-async (conn, mek, m, { from, q, reply }) => {
+function extractCity(text = "") {
+  // "weather Colombo" -> "Colombo"
+  return text.replace(/^\s*weather\s+/i, "").trim();
+}
+
+// 1) city -> lat/lon (Geocoding)
+async function geocodeCity(city, units = "metric") {
+  const url =
+    `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(city)}` +
+    `&limit=1&appid=${OPENWEATHER_API_KEY}&units=${units}`;
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Geocoding failed: ${res.status}`);
+  const data = await res.json();
+  if (!data?.length) return null;
+
+  const best = data[0];
+  return { lat: best.lat, lon: best.lon, name: best.name, country: best.country };
+}
+
+// 2) lat/lon -> Current weather
+async function getCurrentWeather(lat, lon, units = "metric") {
+  const url =
+    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}` +
+    `&appid=${OPENWEATHER_API_KEY}&units=${units}`;
+
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Weather failed: ${res.status}`);
+  return await res.json();
+}
+
+function formatWeather(w, location) {
+  const temp = w.main?.temp;
+  const feels = w.main?.feels_like;
+  const desc = w.weather?.[0]?.description;
+  const wind = w.wind?.speed;
+  const humidity = w.main?.humidity;
+
+  return [
+    `📍 ${location}`,
+    `🌡️ Temp: ${temp}°C`,
+    `🤒 Feels like: ${feels}°C`,
+    `📝 ${desc}`,
+    `💧 Humidity: ${humidity}%`,
+    `💨 Wind: ${wind} m/s`,
+  ].join("
+");
+}
+
+async function main() {
+  const sock = makeWASocket({});
+
+  sock.ev.on("messages.upsert", async ({ messages }) => {
+    const m = messages[0];
+    if (!m.message || m.key?.fromMe) return;
+
+    const text =
+      m.message.conversation ||
+      m.message.extendedTextMessage?.text ||
+      "";
+
+    const city = extractCity(text);
+    if (!city) return;
 
     try {
+      const geo = await geocodeCity(city);
+      if (!geo) {
+        await sock.sendMessage(m.key.remoteJid, { text: `City not found: ${city}` });
+        return;
+      }
 
-        if (!q) {
-            return reply(
-                `🌤️ *DILA-MD WEATHER*\n\n` +
-                `Use:\n` +
-                `.weather Colombo\n` +
-                `.weather Negombo\n` +
-                `.weather Kandy`
-            );
-        }
+      const w = await getCurrentWeather(geo.lat, geo.lon);
+      const reply = formatWeather(w, `${geo.name}${geo.country ? ", " + geo.country : ""}`);
 
-        const city = q.trim();
-
-        // Get current weather
-        const url =
-            `https://api.openweathermap.org/data/2.5/weather` +
-            `?q=${encodeURIComponent(city)}` +
-            `&appid=${API_KEY}` +
-            `&units=metric`;
-
-        const response = await axios.get(url);
-        const data = response.data;
-
-        const name = data.name;
-        const country = data.sys?.country || '';
-        const temp = data.main?.temp;
-        const feels = data.main?.feels_like;
-        const humidity = data.main?.humidity;
-        const pressure = data.main?.pressure;
-        const wind = data.wind?.speed;
-        const description = data.weather?.[0]?.description || 'Unknown';
-        const visibility = data.visibility
-            ? (data.visibility / 1000).toFixed(1)
-            : 'N/A';
-
-        const weatherEmoji = {
-            'clear sky': '☀️',
-            'few clouds': '🌤️',
-            'scattered clouds': '⛅',
-            'broken clouds': '☁️',
-            'overcast clouds': '☁️',
-            'light rain': '🌦️',
-            'moderate rain': '🌧️',
-            'heavy intensity rain': '🌧️',
-            'thunderstorm': '⛈️',
-            'snow': '❄️',
-            'mist': '🌫️',
-            'fog': '🌫️'
-        };
-
-        const emoji = weatherEmoji[description.toLowerCase()] || '🌤️';
-
-        const text =
-`╭━━━〔 🌤️ DILA-MD WEATHER 〕━━━╮
-┃
-┃ 📍 Location: ${name}, ${country}
-┃ ${emoji} Condition: ${description}
-┃ 🌡️ Temperature: ${temp}°C
-┃ 🤒 Feels Like: ${feels}°C
-┃ 💧 Humidity: ${humidity}%
-┃ 💨 Wind: ${wind} m/s
-┃ 🧭 Pressure: ${pressure} hPa
-┃ 👁️ Visibility: ${visibility} km
-┃
-╰━━━━━━━━━━━━━━━━━━━━━━╯
-> Powered by DILA-MD`;
-
-        await conn.sendMessage(from, {
-            text: text
-        }, { quoted: mek });
-
-    } catch (error) {
-
-        if (error.response?.status === 404) {
-            return reply(
-                `❌ *City Not Found!*\n\n` +
-                `Example:\n` +
-                `.weather Colombo`
-            );
-        }
-
-        if (error.response?.status === 401) {
-            return reply(
-                `❌ *OpenWeather API Key Error!*\n\n` +
-                `Please check your API key.`
-            );
-        }
-
-        console.log('Weather Error:', error.message);
-
-        return reply(
-            `❌ *Weather Error!*\n\n` +
-            `Please try again later.`
-        );
+      await sock.sendMessage(m.key.remoteJid, { text: reply });
+    } catch (err) {
+      await sock.sendMessage(m.key.remoteJid, { text: `Error: ${err.message}` });
     }
-});
+  });
+}
+
+main();
