@@ -1,5 +1,9 @@
 const { cmd } = require('../command');
 const axios = require('axios');
+const { cmd } = require('../command');
+const axios = require('axios');
+
+console.log("🔥 DILA-MD APIFY SONG PLUGIN LOADED");
 
 cmd({
     pattern: "song",
