@@ -43,7 +43,7 @@ const {
   const ownerNumber = ['94742876482']
   
   const tempDir = path.join(os.tmpdir(), 'cache-temp')
-  if (!fs.existsSync2tempDir)) {
+  if (!fs.existsSync(tempDir)) {
       fs.mkdirSync(tempDir)
   }
   
@@ -60,7 +60,7 @@ const {
   
   setInterval(clearTempDir, 5 * 60 * 1000);
   
-//======= 🌟 NEW SECURE DIRECT SESSION EXTRACTOR (FIXED FOR DARK-SHADOW-MD) 🌟 =======
+//======= 🌟 NEW SECURE DIRECT SESSION EXTRACTOR (PERFECT FIX) 🌟 =======
 const sessionFolder = path.join(__dirname, 'sessions');
 if (!fs.existsSync(sessionFolder)) {
     fs.mkdirSync(sessionFolder, { recursive: true });
@@ -107,7 +107,7 @@ const port = process.env.PORT || 8000;
           logger: P({ level: 'silent' }),
           printQRInTerminal: false,
           browser: Browsers.macOS("Firefox"),
-          syncFullHistory: false, // Replit/GitHub වේගවත් කිරීමට false කරන ලදී
+          syncFullHistory: false, // වේගවත් කිරීමට false කරන ලදී
           auth: state,
           version
           })
@@ -135,10 +135,9 @@ const port = process.env.PORT || 8000;
   
   let up = `*Hello There DARK-SHADOW-MD User! \ud83d\udc4b\ud83c\udffb* \n\n> Simple , Straight Forward But Loaded With Features \ud83c\udf8a, Meet DARK-SHADOW MD WhatsApp Bot.\n\n *Thanks for using DARK-SHADOW-MD \ud83d\udea9* \n\n- *YOUR PREFIX:* = ${prefix}\n\n> © Powered BY DARK-SHADOW \ud83d\udda4`;
   try {
-      await conn.sendMessage(conn.user.id, { image: { url: `https://telegra.ph/file/1ece2e0281513c05d20ee.jpg` }, caption: up })
-  } catch(e) {
-      console.log("Welcome message sent via plain text due to media restriction.");
       await conn.sendMessage(conn.user.id, { text: up });
+  } catch(e) {
+      console.log("Welcome message transmission trigger failed:", e.message);
   }
   }
   })
@@ -179,7 +178,6 @@ const port = process.env.PORT || 8000;
         const isCmd = body.startsWith(prefix)
         const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
         
-        // (ප්ලගින් මැචර් එක සහ කමාන්ඩ් හැන්ඩ්ලර් එක බොට් සර්වර් එකේ ප්ලගින් ලෝඩරයෙන්ම ක්‍රියාත්මක වේ)
     } catch(err) {
         console.error("Upsert loop safety trigger:", err.message);
     }
