@@ -34,15 +34,15 @@ async (conn, mek, m, { from, q, reply, sender }) => {
             }
         });
 
+        // Get weather data
         const response = await axios.get(url);
         const data = response.data;
 
-        // Newsletter Context
+        // Newsletter context
         const newsletterContext = {
             mentionedJid: [sender],
             forwardingScore: 1000,
             isForwarded: true,
-
             forwardedNewsletterMessageInfo: {
                 newsletterJid: '120363429118791328@newsletter',
                 newsletterName: '𝐃𝐈𝐋𝐀 𝐌𝐃',
@@ -50,7 +50,7 @@ async (conn, mek, m, { from, q, reply, sender }) => {
             }
         };
 
-        // Weather information
+        // Weather message
         const weatherInfo = `
 ╭━━━〔 🌤️ 𝐖𝐄𝐀𝐓𝐇𝐄𝐑 〕━━━╮
 ┃
@@ -98,6 +98,7 @@ async (conn, mek, m, { from, q, reply, sender }) => {
 
         console.log("Weather Error:", e);
 
+        // Error reaction
         await conn.sendMessage(from, {
             react: {
                 text: '❌',
