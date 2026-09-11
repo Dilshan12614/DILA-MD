@@ -12,15 +12,34 @@ cmd({
 async (conn, mek, m, { from, q, reply }) => {
 
     try {
+
+        // Check URL
         if (!q) {
-            return reply("❌ YouTube link එකක් දෙන්න.\n\nExample:\n.song https://youtube.com/watch?v=xxxx");
+            return reply(
+                "❌ *YouTube link එකක් දෙන්න.*\n\n" +
+                "📌 Example:\n" +
+                ".song https://youtube.com/watch?v=xxxx"
+            );
         }
 
+        // Check Apify Token
         if (!process.env.APIFY_TOKEN) {
-            return reply("❌ APIFY_TOKEN GitHub Secrets වල නැහැ.");
+            return reply(
+                "❌ *APIFY_TOKEN හම්බුණේ නැහැ.*\n\n" +
+                "Railway → Variables වලට APIFY_TOKEN එක add කරලා Deploy කරන්න."
+            );
         }
 
-        await reply("⏳ Downloading song...\n\n🎵 Please wait...");
+        // Check YouTube URL
+        if (!q.includes("youtube.com") && !q.includes("youtu.be")) {
+            return reply("❌ කරුණාකර valid YouTube link එකක් දෙන්න.");
+        }
+
+        await reply(
+            "⏳ *Downloading Song...*\n\n" +
+            "🎵 Processing...\n" +
+            "⌛ Please wait..."
+        );
 
         const apiUrl =
             "https://api.apify.com/v2/acts/streamers~youtube-video-downloader/run-sync-get-dataset-items";
@@ -30,9 +49,10 @@ async (conn, mek, m, { from, q, reply }) => {
             {
                 videos: [
                     {
-                        url: q
+                        url: q.trim()
                     }
                 ],
+
                 storeInKVStore: true,
                 preferredQuality: "720p",
                 preferredFormat: "mp3",
@@ -42,34 +62,56 @@ async (conn, mek, m, { from, q, reply }) => {
                 params: {
                     token: process.env.APIFY_TOKEN
                 },
+
                 headers: {
                     "Content-Type": "application/json"
                 },
+
                 timeout: 300000
             }
         );
 
         const data = response.data;
 
-        if (!Array.isArray(data) || !data.length) {
-            return reply("❌ Audio download result එකක් ලැබුණේ නැහැ.");
+        // No result
+        if (!Array.isArray(data) || data.length === 0) {
+            return reply(
+                "❌ *Song download result එකක් ලැබුණේ නැහැ.*"
+            );
         }
 
         const result = data[0];
 
+        console.log(
+            "APIFY RESULT:",
+            JSON.stringify(result, null, 2)
+        );
+
+        // Find download URL
         const downloadUrl =
             result.downloadUrl ||
-            result.url ||
             result.audioUrl ||
+            result.url ||
             result.videoUrl;
 
         if (!downloadUrl) {
-            console.log("APIFY RESULT:", JSON.stringify(result, null, 2));
-            return reply("❌ Download URL එක result එකේ නැහැ.");
+            return reply(
+                "❌ *Audio download link එක හම්බුණේ නැහැ.*\n\n" +
+                "Apify result එක check කරන්න."
+            );
         }
 
-        const title = result.title || "DILA-MD Song";
+        const title =
+            result.title ||
+            result.name ||
+            "DILA-MD Song";
 
+        // Clean filename
+        const safeTitle = title
+            .replace(/[<>:"/\\|?*]/g, "")
+            .substring(0, 100);
+
+        // Send Audio
         await conn.sendMessage(
             from,
             {
@@ -77,7 +119,7 @@ async (conn, mek, m, { from, q, reply }) => {
                     url: downloadUrl
                 },
                 mimetype: "audio/mpeg",
-                fileName: `${title}.mp3`,
+                fileName: `${safeTitle}.mp3`,
                 ptt: false
             },
             {
@@ -85,17 +127,26 @@ async (conn, mek, m, { from, q, reply }) => {
             }
         );
 
+        console.log(
+            `✅ Song sent successfully: ${safeTitle}`
+        );
+
     } catch (error) {
 
         console.error(
-            "APIFY ERROR:",
+            "❌ APIFY SONG ERROR:",
             error.response?.data || error.message
         );
 
+        let reason =
+            error.response?.data?.error?.message ||
+            error.response?.data?.message ||
+            error.message ||
+            "Unknown error";
+
         return reply(
-            "❌ Song download failed.\n\n" +
-            "Reason: " +
-            (error.response?.data?.error?.message || error.message)
+            "❌ *Song Download Failed*\n\n" +
+            "⚠️ " + reason
         );
     }
 });
