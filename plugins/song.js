@@ -28,9 +28,8 @@ Example:
             );
         }
 
-        await reply("🔎 Searching for your song...");
+        await reply("🔎 *Searching for your song...*");
 
-        // YouTube search
         const search = await yts(q);
 
         if (!search.videos || search.videos.length === 0) {
@@ -46,62 +45,79 @@ Example:
         await reply(
 `🎵 *DILA-MD SONG*
 
-📌 *Title:* ${title}
-⏱️ *Duration:* ${video.timestamp}
-👤 *Channel:* ${video.author.name}
+╭━━━━━━━━━━━━━━━━━━╮
+┃ 🎶 *TITLE:* ${title}
+┃ ⏱️ *DURATION:* ${video.timestamp}
+┃ 👤 *CHANNEL:* ${video.author.name}
+╰━━━━━━━━━━━━━━━━━━╯
 
-⬇️ Downloading audio...`
+⬇️ *Downloading audio...*`
         );
 
         /*
-         * Replace this API URL with your working
-         * YouTube audio API if your current API changes.
+         * YouTube Audio API
+         * Vreden API removed
          */
-        const api = `https://api.vreden.my.id/api/ytmp3?url=${encodeURIComponent(url)}`;
 
-        const response = await axios.get(api);
+        const apiUrl =
+            `https://api.ryzendesu.vip/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
 
-        if (!response.data || !response.data.result) {
-            return reply("❌ Audio download failed.");
+        const response = await axios.get(apiUrl, {
+            timeout: 60000
+        });
+
+        const data = response.data;
+
+        if (!data) {
+            throw new Error("API returned empty response");
         }
-
-        const result = response.data.result;
 
         const audioUrl =
-            result.download ||
-            result.url ||
-            result.download_url;
+            data.url ||
+            data.downloadUrl ||
+            data.download ||
+            data.result?.url ||
+            data.result?.download ||
+            data.result?.download_url;
 
         if (!audioUrl) {
-            return reply("❌ Audio URL එක ලැබුණේ නැහැ.");
+            console.log("API RESPONSE:", data);
+            throw new Error("Audio download URL not found");
         }
 
-        await conn.sendMessage(from, {
-            audio: {
-                url: audioUrl
-            },
-            mimetype: "audio/mpeg",
-            fileName: `${title}.mp3`,
-            contextInfo: {
-                externalAdReply: {
-                    title: title,
-                    body: "🎵 DILA-MD",
-                    thumbnailUrl: thumbnail,
-                    sourceUrl: url,
-                    mediaType: 1,
-                    renderLargerThumbnail: true
+        await conn.sendMessage(
+            from,
+            {
+                audio: {
+                    url: audioUrl
+                },
+                mimetype: "audio/mpeg",
+                fileName: `${title.replace(/[\\/:*?"<>|]/g, '')}.mp3`,
+                contextInfo: {
+                    externalAdReply: {
+                        title: title,
+                        body: "🎵 DILA-MD",
+                        thumbnailUrl: thumbnail,
+                        sourceUrl: url,
+                        mediaType: 1,
+                        renderLargerThumbnail: true
+                    }
                 }
+            },
+            {
+                quoted: mek
             }
-        }, {
-            quoted: mek
-        });
+        );
 
     } catch (error) {
         console.error("SONG PLUGIN ERROR:", error);
+
         return reply(
 `❌ *Song Download Error*
 
-${error.message || "Unknown error"}`
+⚠️ ${error.message || "Unknown error"}
+
+💡 Try another song or try again later.`
         );
     }
 });
