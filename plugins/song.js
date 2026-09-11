@@ -1,170 +1,101 @@
 const { cmd } = require('../command');
-const yts = require('yt-search');
-const fs = require('fs');
-const path = require('path');
-const { execFile } = require('child_process');
-
-const TEMP_DIR = path.join(__dirname, '../temp');
-
-if (!fs.existsSync(TEMP_DIR)) {
-    fs.mkdirSync(TEMP_DIR, { recursive: true });
-}
-
-function runYtDlp(args) {
-    return new Promise((resolve, reject) => {
-        execFile('yt-dlp', args, {
-            timeout: 180000,
-            maxBuffer: 1024 * 1024 * 10
-        }, (error, stdout, stderr) => {
-            if (error) {
-                console.error('yt-dlp error:', stderr);
-                return reject(error);
-            }
-
-            resolve(stdout);
-        });
-    });
-}
+const axios = require('axios');
 
 cmd({
     pattern: "song",
-    alias: ["play", "music"],
-    desc: "Download YouTube song as audio",
+    alias: ["mp3", "audio"],
+    desc: "Download YouTube audio",
     category: "download",
     react: "🎵",
     filename: __filename
 },
-async (conn, mek, m, {
-    from,
-    q,
-    reply
-}) => {
-
-    let outputFile = null;
+async (conn, mek, m, { from, q, reply }) => {
 
     try {
-
         if (!q) {
-            return reply(
-`🎵 *DILA-MD SONG*
-
-╭━━━━━━━━━━━━━━━━━━╮
-┃ 🎧 *Usage*
-┃ .song <song name>
-┃
-┃ 🎵 *Example*
-┃ .song Alan Walker Faded
-╰━━━━━━━━━━━━━━━━━━╯`
-            );
+            return reply("❌ YouTube link එකක් දෙන්න.\n\nExample:\n.song https://youtube.com/watch?v=xxxx");
         }
 
-        await reply("🔎 *Searching YouTube...*");
-
-        const search = await yts(q);
-
-        if (!search.videos || !search.videos.length) {
-            return reply("❌ Song එක හොයාගන්න බැරි වුණා.");
+        if (!process.env.APIFY_TOKEN) {
+            return reply("❌ APIFY_TOKEN GitHub Secrets වල නැහැ.");
         }
 
-        const video = search.videos[0];
+        await reply("⏳ Downloading song...\n\n🎵 Please wait...");
 
-        const title = video.title;
-        const url = video.url;
-        const safeTitle = title
-            .replace(/[\\/:*?"<>|]/g, '')
-            .replace(/\s+/g, ' ')
-            .trim()
-            .slice(0, 80);
+        const apiUrl =
+            "https://api.apify.com/v2/acts/streamers~youtube-video-downloader/run-sync-get-dataset-items";
 
-        outputFile = path.join(
-            TEMP_DIR,
-            `${Date.now()}-${safeTitle}.mp3`
+        const response = await axios.post(
+            apiUrl,
+            {
+                videos: [
+                    {
+                        url: q
+                    }
+                ],
+                storeInKVStore: true,
+                preferredQuality: "720p",
+                preferredFormat: "mp3",
+                filenameTemplateParts: ["title"]
+            },
+            {
+                params: {
+                    token: process.env.APIFY_TOKEN
+                },
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                timeout: 300000
+            }
         );
 
-        await reply(
-`🎵 *DILA-MD SONG*
+        const data = response.data;
 
-╭━━━━━━━━━━━━━━━━━━╮
-┃ 🎶 *Title:* ${title}
-┃ ⏱️ *Duration:* ${video.timestamp}
-┃ 👤 *Channel:* ${video.author.name}
-╰━━━━━━━━━━━━━━━━━━╯
-
-⬇️ *Downloading audio...*`
-        );
-
-        /*
-         * yt-dlp downloads the audio directly.
-         * No Vreden API required.
-         */
-
-        await runYtDlp([
-            '--no-playlist',
-            '--extract-audio',
-            '--audio-format', 'mp3',
-            '--audio-quality', '192K',
-            '--no-warnings',
-            '--quiet',
-            '-o', outputFile,
-            url
-        ]);
-
-        if (!fs.existsSync(outputFile)) {
-            throw new Error("MP3 file was not created.");
+        if (!Array.isArray(data) || !data.length) {
+            return reply("❌ Audio download result එකක් ලැබුණේ නැහැ.");
         }
 
-        const stats = fs.statSync(outputFile);
+        const result = data[0];
 
-        if (stats.size === 0) {
-            throw new Error("Downloaded MP3 is empty.");
+        const downloadUrl =
+            result.downloadUrl ||
+            result.url ||
+            result.audioUrl ||
+            result.videoUrl;
+
+        if (!downloadUrl) {
+            console.log("APIFY RESULT:", JSON.stringify(result, null, 2));
+            return reply("❌ Download URL එක result එකේ නැහැ.");
         }
 
-        await reply("📤 *Sending audio...*");
+        const title = result.title || "DILA-MD Song";
 
         await conn.sendMessage(
             from,
             {
-                audio: fs.readFileSync(outputFile),
-                mimetype: 'audio/mpeg',
-                fileName: `${safeTitle}.mp3`,
-                contextInfo: {
-                    externalAdReply: {
-                        title: title,
-                        body: '🎵 DILA-MD',
-                        sourceUrl: url,
-                        mediaType: 1,
-                        renderLargerThumbnail: true
-                    }
-                }
+                audio: {
+                    url: downloadUrl
+                },
+                mimetype: "audio/mpeg",
+                fileName: `${title}.mp3`,
+                ptt: false
             },
             {
                 quoted: mek
             }
         );
 
-        /*
-         * Delete temporary file
-         */
-        try {
-            fs.unlinkSync(outputFile);
-        } catch (e) {}
-
     } catch (error) {
 
-        console.error("SONG PLUGIN ERROR:", error);
-
-        if (outputFile && fs.existsSync(outputFile)) {
-            try {
-                fs.unlinkSync(outputFile);
-            } catch (e) {}
-        }
+        console.error(
+            "APIFY ERROR:",
+            error.response?.data || error.message
+        );
 
         return reply(
-`❌ *Song Download Error*
-
-⚠️ ${error.message || "Unknown error"}
-
-💡 Please try another song.`
+            "❌ Song download failed.\n\n" +
+            "Reason: " +
+            (error.response?.data?.error?.message || error.message)
         );
     }
 });
