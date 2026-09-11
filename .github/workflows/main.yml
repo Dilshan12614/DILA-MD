@@ -1,4 +1,4 @@
-name: Node.js CI/CD Workflow
+name: DILA-MD CI/CD
 
 on:
   push:
@@ -21,7 +21,6 @@ jobs:
         node-version: [20.x]
 
     steps:
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -29,16 +28,16 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: npm
 
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Install FFmpeg & ImageMagick
+      - name: Install FFmpeg
         run: |
-          sudo rm -rf /var/lib/apt/lists/*
-          sudo apt-get clean
-          sudo apt-get update -o Acquire::Retries=5
-          sudo apt-get install -y --fix-missing ffmpeg imagemagick
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          ffmpeg -version
 
       - name: Check SESSION_ID
         env:
@@ -50,7 +49,7 @@ jobs:
           fi
           echo "✅ SESSION_ID is set"
 
-      - name: Start application
+      - name: Start DILA-MD
         env:
           SESSION_ID: ${{ secrets.SESSION_ID }}
         run: node index.js
