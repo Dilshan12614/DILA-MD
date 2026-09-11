@@ -153,7 +153,7 @@ cmd(
         forwardedNewsletterMessageInfo: {
 
           newsletterJid:
-            "120363292876277898@newsletter",
+            "120363429118791328@newsletter",
 
           newsletterName:
             "DiLA 𝐌𝐃",
