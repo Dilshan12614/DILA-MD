@@ -59,29 +59,34 @@ Example:
          * Vreden API removed
          */
 
-        const apiUrl =
-            `https://api.ryzendesu.vip/api/downloader/ytmp3?url=${encodeURIComponent(url)}`;
-
-        const response = await axios.get(apiUrl, {
-            timeout: 60000
-        });
+        // YouTube MP3 conversion
+        const response = await axios.post(
+            "https://ytmp3.ge/api/convert",
+            new URLSearchParams({
+                youtube_url: url,
+                quality: "192"
+            }).toString(),
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                timeout: 120000
+            }
+        );
 
         const data = response.data;
 
-        if (!data) {
-            throw new Error("API returned empty response");
+        console.log("YTMP3 API RESPONSE:", data);
+
+        if (!data || data.success !== true) {
+            throw new Error(
+                data?.error || "YouTube conversion failed"
+            );
         }
 
-        const audioUrl =
-            data.url ||
-            data.downloadUrl ||
-            data.download ||
-            data.result?.url ||
-            data.result?.download ||
-            data.result?.download_url;
+        const audioUrl = data.downloadUrl;
 
         if (!audioUrl) {
-            console.log("API RESPONSE:", data);
             throw new Error("Audio download URL not found");
         }
 
@@ -108,16 +113,3 @@ Example:
                 quoted: mek
             }
         );
-
-    } catch (error) {
-        console.error("SONG PLUGIN ERROR:", error);
-
-        return reply(
-`❌ *Song Download Error*
-
-⚠️ ${error.message || "Unknown error"}
-
-💡 Try another song or try again later.`
-        );
-    }
-});
