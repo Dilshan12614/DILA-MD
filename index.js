@@ -40,7 +40,7 @@ const {
   const path = require('path')
   const prefix = config.PREFIX
   
-  const ownerNumber = ['94742876482']
+  const ownerNumber = ['94740534738']
   
   const tempDir = path.join(os.tmpdir(), 'cache-temp')
   if (!fs.existsSync(tempDir)) {
@@ -60,19 +60,22 @@ const {
   
   setInterval(clearTempDir, 5 * 60 * 1000);
   
-//======= 🌟 NEW SECURE DIRECT SESSION EXTRACTOR (ULTIMATE BULLETPROOF FIX) 🌟 =======
+//======= 🌟 NEW SECURE DIRECT SESSION EXTRACTOR (PRABATH-MD UPDATED FIXED) 🌟 =======
 const sessionFolder = path.join(__dirname, 'sessions');
 if (!fs.existsSync(sessionFolder)) {
     fs.mkdirSync(sessionFolder, { recursive: true });
 }
 
 if (!fs.existsSync(path.join(sessionFolder, 'creds.json'))) {
-    let rawSession = config.SESSION_ID || process.env.SESSION_ID;
+    // 1. Config හෝ Environment Variables වල SESSION_ID එකක් නැත්නම් ඔබ ලබාදුන් ස්ථිර ID එක භාවිත කරයි
+    let rawSession = config.SESSION_ID || process.env.SESSION_ID || "PRABATH-MD~stmYcPHJzekThLz";
+    
     if (!rawSession) {
         console.log('❌ Please add your session to SESSION_ID env or config.js !!');
     } else {
         try {
             let cleanString = String(rawSession)
+                .replace(/^PRABATH-MD~/, '') // PRABATH-MD prefix එක ඉවත් කරයි
                 .replace(/^DILSHAN-MD;;;/, '')
                 .replace(/^DILSHAN-MD;;/, '')
                 .replace(/^DILSHAN-MD;/, '')
@@ -141,7 +144,7 @@ const port = process.env.PORT || 8000;
   console.log('Plugins installed successful ✅')
   console.log('Bot connected to whatsapp ✅')
   
-  let up = `*Hello There DARK-SHADOW-MD User! \ud83d\udc4b\ud83c\udffb* \n\n> Bot connected successfully!\n- *YOUR PREFIX:* = ${prefix}\n\n> © Powered BY DARK-SHADOW \ud83d\udda4`;
+  let up = `*Hello There PRABATH-MD User! \ud83d\udc4b\ud83c\udffb* \n\n> Bot connected successfully!\n- *YOUR PREFIX:* = ${prefix}\n\n> © Powered BY PRABATH-MD \ud83d\udda4`;
   try {
       await conn.sendMessage(conn.user.id, { text: up });
   } catch(e) {
