@@ -68,7 +68,8 @@ const {
 if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
 if(!config.SESSION_ID) return console.log('Please add your session to SESSION_ID env !!')
 const sessdata = config.SESSION_ID.replace("PRABATH-MD~", '');
-const filer = File.fromURL(sessdata.startsWith('http') ? sessdata : `https://mega.nz{sessdata.replace('PRABATH-MD~', '')}#`);
+const cleanedId = sessdata.replace('PRABATH-MD~', '');
+const filer = File.fromURL('https://mega.nz' + cleanedId + '#');
 
 filer.download((err, data) => {
 if(err) throw err
