@@ -9,24 +9,24 @@ cmd({
 },
 async (conn, mek, from, options) => {
     try {
-        // මැසේජ් එක ලැබුණු වෙලාව සහ දැන් වෙලාව අතර වෙනස බැලීම
+        // 'from' අගය String එකක් බවට ස්ථිර කර ගැනීම (Error එක මඟහරවා ගැනීමට)
+        const targetJid = typeof from === 'string' ? from : (mek.key.remoteJid || String(from));
+
         const startTime = Date.now();
         
-        // මුලින්ම කුඩා මැසේජ් එකක් යවනවා
-        const pingMsg = await conn.sendMessage(from, { text: '*Testing Speed... ⏳*' }, { quoted: mek });
+        // මුලින්ම පණිවිඩය යැවීම
+        const pingMsg = await conn.sendMessage(targetJid, { text: '*Testing Speed... ⏳*' }, { quoted: mek });
         
-        // මැසේජ් එක ගිය පසු ගතවූ කාලය ගණනය කිරීම
         const endTime = Date.now();
         const pingTime = endTime - startTime;
 
-        // පරණ මැසේජ් එක වෙනස් කර (Edit) නියම Ping එක ලස්සනට පෙන්වීම
-        await conn.sendMessage(from, { 
+        // පණිවිඩය Edit කිරීම
+        await conn.sendMessage(targetJid, { 
             text: `*DENETH-MD SPEED* 🚀\n\n⚡ *Ping:* \`${pingTime} ms\`\n📶 *Status:* \`Excellent\``,
             edit: pingMsg.key 
         });
 
     } catch (e) {
         console.log("Ping Command Error: ", e);
-        await conn.sendMessage(from, { text: `❌ වැරදීමක් සිදුවුණා: ${e.message}` }, { quoted: mek });
     }
 });
