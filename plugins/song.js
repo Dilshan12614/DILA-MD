@@ -10,14 +10,14 @@ cmd({
 },
 async (conn, mek, from, options) => {
     try {
-        // JID අගය String එකක් බවට ස්ථිර කර ගැනීම (Crashes වැළැක්වීමට)
+        // JID අගය String එකක් බවට තහවුරු කර ගැනීම
         const targetJid = typeof from === 'string' ? from : (mek.key.remoteJid || String(from));
         
-        // පරිශීලකයා ඇතුළත් කළ සින්දුවේ නම හෝ YouTube ලින්ක් එක ලබා ගැනීම
+        // පරිශීලකයා ඇතුළත් කළ සින්දුවේ නම හෝ ලින්ක් එක ලබා ගැනීම
         const args = options.args;
         if (!args || args.length === 0) {
             return await conn.sendMessage(targetJid, { 
-                text: "⚠️ Please provide a song name or a YouTube link!\n\n*Example:* `.song Malamin weela` or `.song https://youtu.be...`" 
+                text: "⚠️ Please provide a song name or a YouTube link!\n\n*Example:* `.song Lelena` or `.song https://youtu.be...`" 
             }, { quoted: mek });
         }
 
@@ -28,21 +28,37 @@ async (conn, mek, from, options) => {
             text: `🎵 *DENETH-MD Searching Your Song...*\n\`"${text}"\`` 
         }, { quoted: mek });
 
-        // පොදු සහ නොමිලේ භාවිතා කළ හැකි යූටියුබ් API එකක් හරහා දත්ත ලබා ගැනීම
+        // වඩාත් ස්ථාවර නව පොදු API එකක් හරහා යූටියුබ් දත්ත ලබා ගැනීම
         const searchUrl = `https://dreaded.site{encodeURIComponent(text)}`;
-        const response = await axios.get(searchUrl);
-        const resData = response.data;
+        const fallbackUrl = `https://giftedtech.my.id{encodeURIComponent(text)}`;
+        
+        let resData;
+        try {
+            // පළමු API එක උත්සාහ කිරීම
+            const response = await axios.get(searchUrl);
+            resData = response.data;
+        } catch (apiErr) {
+            // පළමු API එක වැඩ නොකළහොත් දෙවන ස්ථාවර API එක උත්සාහ කිරීම
+            const response = await axios.get(`https://giftedtech.my.id{encodeURIComponent(text)}`);
+            if (response.data && response.data.results && response.data.results.length > 0) {
+                const videoUrl = response.data.results[0].url;
+                const dlResponse = await axios.get(`https://giftedtech.my.id{encodeURIComponent(videoUrl)}`);
+                resData = dlResponse.data;
+            }
+        }
 
-        if (!resData || !resData.result) {
+        // දත්ත ලැබී ඇත්දැයි පරීක්ෂා කිරීම (නව API රටාවට අනුව)
+        if (!resData || (!resData.result && !resData.data)) {
             return await conn.sendMessage(targetJid, { 
                 text: "❌ Song not found! Please check the name or link and try again.", 
                 edit: loadingMsg.key 
             });
         }
 
-        const song = resData.result;
+        // ලැබුණු දත්ත වෙන් කර ගැනීම
+        const song = resData.result || resData.data;
         const title = song.title || "Audio File";
-        const downloadUrl = song.downloadUrl || song.mp3 || song.dl_link;
+        const downloadUrl = song.downloadUrl || song.download_url || song.mp3 || song.url;
 
         // සින්දුව ඩවුන්ලෝඩ් වන බව පෙන්වීමට මැසේජ් එක Edit කිරීම
         await conn.sendMessage(targetJid, { 
@@ -56,7 +72,7 @@ async (conn, mek, from, options) => {
             fileName: `${title}.mp3` 
         }, { quoted: mek });
 
-        // බාගත කිරීම සාර්ථක වූ පසු මැසේජ් එක අවසන් වරට යාවත්කාලීන කිරීම
+        // බාගත කිරීම සාර්ථක වූ පසු මැසේජ් එක යාවත්කාලීන කිරීම
         await conn.sendMessage(targetJid, { 
             text: `✅ *"${title}"* successfully delivered!` 
         }, { edit: loadingMsg.key });
