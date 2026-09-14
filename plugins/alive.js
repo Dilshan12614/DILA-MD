@@ -1,6 +1,7 @@
 const { cmd, commands } = require('../command');
 const os = require("os");
 const { runtime } = require('../lib/functions');
+const { generateWAMessageFromContent, proto } = require('@whiskeysockets/baileys');
 
 cmd({
     pattern: "alive",
@@ -130,36 +131,31 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 ╰──────────────`;
 
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // STEP 7 - BUTTONS SETTING
+        // STEP 7 - NEW TEMPLATE BUTTONS METHOD
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        const myButtons = [
-            { buttonId: '.menu', buttonText: { displayText: '📜 Main Menu' }, type: 1 },
-            { buttonId: '.owner', buttonText: { displayText: '👤 Owner Info' }, type: 1 },
-            { buttonId: '.ping', buttonText: { displayText: '⚡ Bot Speed' }, type: 1 }
+        const buttons = [
+            { index: 1, quickReplyButton: { displayText: '📜 Main Menu', id: '.menu' } },
+            { index: 2, quickReplyButton: { displayText: '👤 Owner Info', id: '.owner' } },
+            { index: 3, quickReplyButton: { displayText: '⚡ Bot Speed', id: '.ping' } }
         ];
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // SEND FINAL MESSAGE WITH BUTTONS
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        await conn.sendButtonText(
-            from, 
-            myButtons, 
-            status, 
-            "© Powered By Deneth MD", 
-            mek,
-            {
-                contextInfo: {
-                    mentionedJid: [m.sender],
-                    forwardingScore: 999,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363429118791328@newsletter',
-                        newsletterName: 'DENETH MD',
-                        serverMessageId: 143
+        const msg = generateWAMessageFromContent(from, {
+            viewOnceMessage: {
+                message: {
+                    templateMessage: {
+                        hydratedTemplate: {
+                            imageMessage: { url: 'https://ibb.co' }, // ඔයාගේ ලස්සන Alive Image එක
+                            hydratedContentText: status,
+                            hydratedFooterText: "© Powered By Deneth MD",
+                            hydratedButtons: buttons
+                        }
                     }
                 }
             }
-        );
+        }, { userJid: conn.user.id, quoted: mek });
+
+        // අලුත් ක්‍රමයට මැසේජ් එක සෙන්ඩ් කිරීම
+        await conn.relayMessage(from, msg.message, { messageId: msg.key.id });
 
         // Delete loading message
         try {
