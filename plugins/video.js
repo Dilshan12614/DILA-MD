@@ -1,8 +1,8 @@
+const { ytmp3 } = require('../lib/ytdl') // හෝ ඔබේ බොට්ගේ යූටියුබ් ඩවුන්ලෝඩර් ෆයිල් එක තියෙන තැන
 const { cmd, commands } = require("../command");
 const yts = require("yt-search");
 const axios = require("axios");
 const config = require("../config");
-const ytdl = require('@distube/ytdl-core')
 
 cmd(
   {
