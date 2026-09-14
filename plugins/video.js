@@ -2,6 +2,7 @@ const { cmd, commands } = require("../command");
 const yts = require("yt-search");
 const axios = require("axios");
 const config = require("../config");
+const ytdl = require('@distube/ytdl-core')
 
 cmd(
   {
