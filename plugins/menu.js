@@ -1,5 +1,6 @@
 const { cmd, commands } = require("../command");
 const config = require("../config");
+const os = require("os");
 const { runtime } = require("../lib/functions");
 
 cmd(
@@ -7,7 +8,7 @@ cmd(
     pattern: "menu",
     alias: ["getmenu", "allmenu"],
     react: "📔",
-    desc: "Get command list with buttons",
+    desc: "Get elegant number list menu",
     category: "main",
     filename: __filename,
   },
@@ -24,80 +25,35 @@ cmd(
     }
   ) => {
     try {
+      // පද්ධතියේ විස්තර ලබා ගැනීම
+      const ramUsage = `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${(os.totalmem() / 1024 / 1024).toFixed(2)}MB`;
+      const botRuntime = runtime(process.uptime());
 
-      // ==========================================
-      // AUTO COMMAND CATEGORIES
-      // ==========================================
-      const categories = {};
+      // ඔයා ඉල්ලපු ලස්සන මෙනු හැඩතල සැකසුම (Design)
+      let madeMenu = `*HELLO ${pushname || "User"}*
 
-      for (let i = 0; i < commands.length; i++) {
-        const cmdData = commands[i];
+*╭─「 ᴄᴏᴍᴍᴀɴᴅꜱ ᴘᴀɴᴇʟ」*
+*│◈ 𝚁𝙰𝙼 𝚄𝚂𝙰𝙶𝙴 -* ${ramUsage}
+*│◈ 𝚁𝚄𝙽𝚃𝙸𝙼𝙴 -* ${botRuntime}
+*╰──────────●●►*
+╭──────────●●►
+│⛵ *LIST MENU*
+│    ───────
+│  1      *CONVERT*
+│ _2_     *OWNER*
+│ _3_     *MAIN*
+│ _4_     *MATHTOOL*
+│ _5_     *DOWNLOAD*
+│ _6_     *SEARCH*
+│ _7_     *AI*
+│ _8_     *GROUP*
+│ _9_     *CHANNEL*
+│ _10_    *GAME*
+│ _11_    *STICKER*
+│ _12_    *SUBBOT*
+╰───────────●●►
 
-        if (
-          cmdData.pattern &&
-          !cmdData.dontAddCommandList
-        ) {
-          const category = (cmdData.category || "other").toLowerCase();
-
-          if (!categories[category]) {
-            categories[category] = [];
-          }
-
-          categories[category].push(
-            `${config.PREFIX}${cmdData.pattern}`
-          );
-        }
-      }
-
-      // ==========================================
-      // MENU HEADER
-      // ==========================================
-      let madeMenu = `╭━━━〔 🚀 DENETH 𝐌𝐃 🚀〕━━━╮
-┃
-┃  ✨ *WELCOME TO DENETH MD* ✨
-┃
-┃  🤖 Your Personal WhatsApp Assistant
-┃  ⚡ Fast • Smart • Powerful
-┃  🛠️ Multi-Feature Bot
-┃
-╰━━━━━━━━━━━━━━━━━━━━━
-
-╭━━〔 🤖 𝐁𝐎𝐓 𝐈𝐍𝐅𝐎 🤖 〕━━━╮
-┃
-┃  👋 Hello, *${pushname || "User"}*
-┃  📚 Commands : *${commands.length}*
-┃  🔰 Prefix   : *${config.PREFIX}*
-┃  ⏱️ Uptime   : *${runtime(process.uptime())}*
-┃
-╰━━━━━━━━━━━━━━━━━━━━━
-
-✦━━━━━━━━━━━━━━━━━━━━━
-          🧑‍💻 *DENETH-𝐌𝐃* 🧑‍💻  
-✦━━━━━━━━━━━━━━━━━━━━━`;
-
-      // ==========================================
-      // AUTOMATIC COMMAND MENU
-      // ==========================================
-      for (const [category, cmdList] of Object.entries(categories)) {
-        madeMenu += `
-╭─⊳⋅📂 *${category.toUpperCase()}* ⋅⊲─╮
-`;
-        for (const command of cmdList) {
-          madeMenu += `┃ ⌬ ${command}\n`;
-        }
-        madeMenu += `╰─⊲⋅════════━━━━━┈⊷\n`;
-      }
-
-      madeMenu += `\n> ⚡*POWERED BY DENETH MD*⚡`;
-
-      // ==========================================
-      // 100% WORKING BUTTON SYSTEM
-      // ==========================================
-      const templateButtons = [
-          { index: 1, quickReplyButton: { displayText: '👤 Owner Info', id: '.owner' } },
-          { index: 2, quickReplyButton: { displayText: '🧚‍♂️ Alive Status', id: '.alive' } },
-          { index: 3, quickReplyButton: { displayText: '⚡ Bot Speed', id: '.ping' } }
-      ];
+*Reply the Number you want to select*`;
 
       // ==========================================
       // NEWSLETTER CONTEXT
@@ -114,17 +70,15 @@ cmd(
       };
 
       // ==========================================
-      // SEND MENU WITH IMAGE & BUTTONS
+      // SEND MENU WITH IMAGE & TEXT
       // ==========================================
       await robin.sendMessage(
         from,
         {
           image: {
-            url: "https://ibb.co", // ඔයා එවපු අලුත්ම ලස්සන Logo Image එක
+            url: "https://ibb.co", // ඔයා එවපු ලස්සන කොළ පාට Logo එක
           },
           caption: madeMenu,
-          footer: "© Powered By Deneth MD",
-          templateButtons: templateButtons,
           contextInfo: newsletterContext,
         },
         {
