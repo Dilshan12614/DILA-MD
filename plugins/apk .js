@@ -1,4 +1,5 @@
 const { cmd, commands } = require("../command");
+const yts = require("yt-search"); // ඇප් නම සර්ච් කිරීමට හෝ Format කිරීමට
 const axios = require("axios");
 
 cmd(
@@ -6,7 +7,7 @@ cmd(
     pattern: "apk",
     alias: ["downloadapk", "playstore"],
     react: "📦",
-    desc: "Download APK files from Google Play Store links.",
+    desc: "Download APK files from Google Play Store links using Apify storage.",
     category: "download",
     filename: __filename,
   },
@@ -26,37 +27,29 @@ cmd(
     }
   ) => {
     try {
-      if (!q) return reply("⚠️ *Please provide a Google Play Store app link or app ID!*");
-
-      // ප්ලේ ස්ටෝර් ලින්ක් එකක් නම්, ඒකෙන් Package ID එක (com.xxx) වෙන් කර ගැනීම
-      let appId = q;
-      if (q.includes("id=")) {
-        appId = q.split("id=")[1].split("&")[0];
-      }
+      if (!q) return reply("⚠️ *Please provide a Google Play Store app link or app name!*");
 
       const targetJid = typeof from === 'string' ? from : (mek.key.remoteJid || String(from));
 
-      // 1. ඇප් එක සෙවීම සහ ඩවුන්ලෝඩ් කිරීම ආරම්භ කිරීමේ මැසේජ් එක
+      // 1. ඇප් එක සෙවීම ආරම්භ කිරීමේ මැසේජ් එක
       const loadingMsg = await danuwa.sendMessage(targetJid, { 
-        text: `📦 *DENETH-MD Fetching APK for ID:* \`"${appId}"\`\n> *Please wait...* ⏳` 
+        text: `📦 *DENETH-MD Processing APK Download...*\n> *Please wait!* ⏳` 
       }, { quoted: mek });
 
-      // 2. APK බාගත කිරීම සඳහා විශ්වාසවන්ත සහ නොමිලේ දෙන පොදු API එකක් භාවිතා කිරීම
-      const apiUrl = `https://dreaded.site{encodeURIComponent(appId)}`;
-      const response = await axios.get(apiUrl);
-      const resData = response.data;
-
-      if (!resData || !resData.result || !resData.result.downloadUrl) {
-        return await danuwa.sendMessage(targetJid, { 
-          text: "❌ *Failed to download the APK. Please ensure the link/ID is correct or try again later.*", 
-          edit: loadingMsg.key 
-        });
+      // ඇප් එකේ නම ලස්සනට පෙනෙන්නට සකස් කර ගැනීම
+      let appName = "Application";
+      if (q.includes("id=")) {
+        let parts = q.split("id=");
+        appName = parts[1].split("&")[0].split(".").pop(); // com.xxx.calculator එකෙන් calculator කොටස පමණක් ගැනීම
+        appName = appName.charAt(0).toUpperCase() + appName.slice(1);
+      } else {
+        appName = q;
       }
 
-      const downloadUrl = resData.result.downloadUrl;
-      const appName = resData.result.name || "Application";
+      // 2. ඔයා දීපු සෘජු Apify APK ලින්ක් එක (Direct Download Link)
+      const downloadUrl = "https://api.apify.com/v2/key-value-stores/fUlRkg7AITRi5X31R/records/apk.zip?signature=1SlbtAjfqyRe0MTTEMJjf";
 
-      await danuwa.sendMessage(targetJid, { text: `✅ *APK Found! Sending document...*` }, { edit: loadingMsg.key });
+      await danuwa.sendMessage(targetJid, { text: `✅ *APK Source Found! Sending document...*` }, { edit: loadingMsg.key });
 
       // 3. වට්සැප් එකට APK එක Document එකක් ලෙස සෘජුවම යැවීම
       await danuwa.sendMessage(
@@ -70,6 +63,7 @@ cmd(
         { quoted: mek }
       );
 
+      return reply("✅ *Thank you for using DENETH-MD!*");
     } catch (e) {
       console.log("APK Downloader Error:", e);
       reply(`❌ *Error:* ${e.message} 😞`);
