@@ -2,7 +2,6 @@ const { cmd, commands } = require('../command');
 const os = require("os");
 const { runtime } = require('../lib/functions');
 const { generateWAMessageFromContent, proto } = require('@whiskeysockets/baileys');
-const config = require('../config');
 
 cmd({
     pattern: "alive",
@@ -19,7 +18,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         const ram = `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${(os.totalmem() / 1024 / 1024).toFixed(2)}MB`;
         const hostname = os.hostname();
 
-        // ප්‍රධාන මැසේජ් එක සකස් කිරීම
+        // ප්‍රධාන මැසේජ් එක ලස්සනට සකස් කිරීම
         const status = `👋 *HELLO ${pushname} I AM ALIVE NOW*
 
 ╭━━〔 *DENETH-MD* 〕━━┈⊷
@@ -32,33 +31,32 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 ┃◈└───────────
 ╰──────────────`;
 
-        // 2026 වට්සැප් නව බොත්තම් ක්‍රමවේදය (Native Flow)
-        const buttonParamsJson = JSON.stringify({
-            buttons: [
-                {
-                    name: "quick_reply",
-                    buttonParamsJson: JSON.stringify({
-                        display_text: "📜 Main Menu",
-                        id: `${config.PREFIX}menu`
-                    })
-                },
-                {
-                    name: "quick_reply",
-                    buttonParamsJson: JSON.stringify({
-                        display_text: "👤 Owner Info",
-                        id: `${config.PREFIX}owner`
-                    })
-                },
-                {
-                    name: "quick_reply",
-                    buttonParamsJson: JSON.stringify({
-                        display_text: "⚡ Bot Speed",
-                        id: `${config.PREFIX}ping`
-                    })
-                }
-            ]
-        });
+        // වට්සැප් නව බොත්තම් ක්‍රමවේදය (Native Flow Buttons)
+        const buttons = [
+            {
+                name: "quick_reply",
+                buttonParamsJson: JSON.stringify({
+                    display_text: "📜 Main Menu",
+                    id: ".menu"
+                })
+            },
+            {
+                name: "quick_reply",
+                buttonParamsJson: JSON.stringify({
+                    display_text: "👤 Owner Info",
+                    id: ".owner"
+                })
+            },
+            {
+                name: "quick_reply",
+                buttonParamsJson: JSON.stringify({
+                    display_text: "⚡ Bot Speed",
+                    id: ".ping"
+                })
+            }
+        ];
 
+        // මෙන්න බොත්තම් සහ ඉමේජ් එක එකතු කර මැසේජ් එක සාදන තැන
         const msg = generateWAMessageFromContent(from, {
             viewOnceMessage: {
                 message: {
@@ -70,12 +68,12 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
                             text: "© Powered By Deneth MD"
                         }),
                         header: proto.Message.InteractiveMessage.Header.fromObject({
-                            title: "DENETH MD STATUS",
+                            title: "DENETH-MD STATUS",
                             hasMediaAttachment: true,
                             imageMessage: { url: 'https://ibb.co' } // ඔයා එවපු Alive Image එක
                         }),
                         nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
-                            buttons: JSON.parse(buttonParamsJson).buttons
+                            buttons: buttons
                         }),
                         contextInfo: {
                             mentionedJid: [m.sender],
