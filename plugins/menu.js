@@ -5,9 +5,9 @@ const { runtime } = require("../lib/functions");
 cmd(
   {
     pattern: "menu",
-    alias: ["getmenu"],
+    alias: ["getmenu", "allmenu"],
     react: "📔",
-    desc: "Get command list",
+    desc: "Get command list with buttons",
     category: "main",
     filename: __filename,
   },
@@ -28,20 +28,16 @@ cmd(
       // ==========================================
       // AUTO COMMAND CATEGORIES
       // ==========================================
-
       const categories = {};
 
       for (let i = 0; i < commands.length; i++) {
-
         const cmdData = commands[i];
 
         if (
           cmdData.pattern &&
           !cmdData.dontAddCommandList
         ) {
-
-          const category =
-            (cmdData.category || "other").toLowerCase();
+          const category = (cmdData.category || "other").toLowerCase();
 
           if (!categories[category]) {
             categories[category] = [];
@@ -53,23 +49,12 @@ cmd(
         }
       }
 
-
-      // ==========================================
-      // SYSTEM INFORMATION
-      // ==========================================
-
-      const platform = process.platform;
-
-
       // ==========================================
       // MENU HEADER
       // ==========================================
-
-      let madeMenu = `
-
-╭━━━〔 🚀DILA 𝐌𝐃🚀〕━━━╮
+      let madeMenu = `╭━━━〔 🚀 DENETH 𝐌𝐃 🚀〕━━━╮
 ┃
-┃  ✨ *WELCOME TO DILA MD* ✨
+┃  ✨ *WELCOME TO DENETH MD* ✨
 ┃
 ┃  🤖 Your Personal WhatsApp Assistant
 ┃  ⚡ Fast • Smart • Powerful
@@ -77,7 +62,7 @@ cmd(
 ┃
 ╰━━━━━━━━━━━━━━━━━━━━━
 
-╭━━〔 🤖𝐁𝐎𝐓 𝐈𝐍𝐅𝐎🤖 〕━━━╮
+╭━━〔 🤖 𝐁𝐎𝐓 𝐈𝐍𝐅𝐎 🤖 〕━━━╮
 ┃
 ┃  👋 Hello, *${pushname || "User"}*
 ┃  📚 Commands : *${commands.length}*
@@ -87,111 +72,69 @@ cmd(
 ╰━━━━━━━━━━━━━━━━━━━━━
 
 ✦━━━━━━━━━━━━━━━━━━━━━
-           🧑‍💻*DILA-𝐌𝐃*🧑‍💻  
-✦━━━━━━━━━━━━━━━━━━━━━
-
-> *POWERED BY DILSHAN*
-
-`;
-
+          🧑‍💻 *DENETH-𝐌𝐃* 🧑‍💻  
+✦━━━━━━━━━━━━━━━━━━━━━`;
 
       // ==========================================
       // AUTOMATIC COMMAND MENU
       // ==========================================
-
       for (const [category, cmdList] of Object.entries(categories)) {
-
         madeMenu += `
 ╭─⊳⋅📂 *${category.toUpperCase()}* ⋅⊲─╮
 `;
-
         for (const command of cmdList) {
           madeMenu += `┃ ⌬ ${command}\n`;
         }
-
-        madeMenu += `╰─⊲⋅════════━━━━━┈⊷
-
-`;
+        madeMenu += `╰─⊲⋅════════━━━━━┈⊷\n`;
       }
 
+      madeMenu += `\n> ⚡*POWERED BY DENETH MD*⚡`;
 
       // ==========================================
-      // FOOTER
+      // 100% WORKING BUTTON SYSTEM
       // ==========================================
-
-      madeMenu += `
-
-╭━━━〔 📢 𝐍𝐄𝐖𝐒𝐋𝐄𝐓𝐓𝐄𝐑 〕━━━╮
-┃
-┃        ✦ 𝐃𝐈𝐋𝐀 𝐌𝐃 ✦
-┃
-┃   🚀 *Stay Connected With Us*
-┃   💫 *Updates • Features • News*
-┃
-╰━━━━━━━━━━━━━━━━━━━━━
-
-        
-> ⚡*POWERED BY DILA MD*⚡
-
-`;
-
+      const templateButtons = [
+          { index: 1, quickReplyButton: { displayText: '👤 Owner Info', id: '.owner' } },
+          { index: 2, quickReplyButton: { displayText: '🧚‍♂️ Alive Status', id: '.alive' } },
+          { index: 3, quickReplyButton: { displayText: '⚡ Bot Speed', id: '.ping' } }
+      ];
 
       // ==========================================
       // NEWSLETTER CONTEXT
       // ==========================================
-
       const newsletterContext = {
-
-        mentionedJid: sender
-          ? [sender]
-          : [],
-
+        mentionedJid: sender ? [sender] : [],
         forwardingScore: 1000,
-
         isForwarded: true,
-
         forwardedNewsletterMessageInfo: {
-
-          newsletterJid:
-            "120363429118791328@newsletter",
-
-          newsletterName:
-            "DiLA 𝐌𝐃",
-
+          newsletterJid: "120363429118791328@newsletter",
+          newsletterName: "DENETH 𝐌𝐃",
           serverMessageId: 143,
         },
       };
 
-
       // ==========================================
-      // SEND MENU
+      // SEND MENU WITH IMAGE & BUTTONS
       // ==========================================
-
       await robin.sendMessage(
         from,
         {
           image: {
-            url:
-              "https://i.ibb.co/6JrfGTrG/temp-image.jpg",
+            url: "https://ibb.co", // ඔයා එවපු අලුත්ම ලස්සන Logo Image එක
           },
-
           caption: madeMenu,
-
+          footer: "© Powered By Deneth MD",
+          templateButtons: templateButtons,
           contextInfo: newsletterContext,
         },
-
         {
           quoted: mek,
         }
       );
 
     } catch (e) {
-
       console.error("MENU ERROR:", e);
-
-      reply(
-        `❌ Menu Error\n\n${e.message || e}`
-      );
+      reply(`❌ Menu Error\n\n${e.message || e}`);
     }
   }
 );
