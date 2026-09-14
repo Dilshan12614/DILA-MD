@@ -164,6 +164,23 @@ const port = process.env.PORT || 8000;
   const text = `${config.AUTO_STATUS_MSG}`
   await conn.sendMessage(user, { text: text, react: { text: '💜', key: mek.key } }, { quoted: mek })
             }
+
+  // ===== BUTTON & LIST RESPONSE READER BY DENETH-MD =====
+  if (mek.message) {
+      if (mek.message.buttonsResponseMessage) {
+          mek.message.conversation = mek.message.buttonsResponseMessage.selectedButtonId;
+      } else if (mek.message.listResponseMessage) {
+          mek.message.conversation = mek.message.listResponseMessage.singleSelectReply.selectedRowId;
+      } else if (mek.message.templateButtonReplyMessage) {
+          mek.message.conversation = mek.message.templateButtonReplyMessage.selectedId;
+      } else if (mek.message.interactiveResponseMessage) {
+          const responseData = JSON.parse(mek.message.interactiveResponseMessage.nativeFlowResponseMessage.paramsJson);
+          mek.message.conversation = responseData.id;
+      }
+  }
+  // ======================================================
+
+            
             await Promise.all([
               saveMessage(mek),
             ]);
