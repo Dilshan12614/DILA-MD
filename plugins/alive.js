@@ -17,7 +17,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // STEP 1 - START LOADING
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         const loading = await conn.sendMessage(from, {
-            text: `╭━━〔 *DILA-MD* 〕━━┈⊷
+            text: `╭━━〔 *DENETH-MD* 〕━━┈⊷
 ┃
 ┃  ⏳ *Loading System...*
 ┃
@@ -34,7 +34,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // STEP 2 - UPTIME
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         await conn.sendMessage(from, {
-            text: `╭━━〔 *DILA-MD* 〕━━┈⊷
+            text: `╭━━〔 *DENETH-MD* 〕━━┈⊷
 ┃
 ┃  ⏳ *Loading Uptime...*
 ┃
@@ -54,7 +54,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // STEP 3 - RAM
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         await conn.sendMessage(from, {
-            text: `╭━━〔 *DILA-MD* 〕━━┈⊷
+            text: `╭━━〔 *DENETH-MD* 〕━━┈⊷
 ┃
 ┃  📟 *Loading RAM Usage...*
 ┃
@@ -75,7 +75,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // STEP 4 - HOSTNAME
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         await conn.sendMessage(from, {
-            text: `╭━━〔 *DILA-MD* 〕━━┈⊷
+            text: `╭━━〔 *DENETH-MD* 〕━━┈⊷
 ┃
 ┃  ⚙️ *Loading HostName...*
 ┃
@@ -97,7 +97,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         // STEP 5 - OWNER
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         await conn.sendMessage(from, {
-            text: `╭━━〔 *DILA-MD* 〕━━┈⊷
+            text: `╭━━〔 *DENETH-MD* 〕━━┈⊷
 ┃
 ┃  👨‍💻 *Loading Owner...*
 ┃
@@ -115,37 +115,51 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // STEP 6 - FINAL
+        // STEP 6 - FINAL TEXT
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        const status = `╭━━〔 *DILA-MD* 〕━━┈⊷
+        const status = `👋 *HELLO ${pushname} I AM ALIVE NOW*
+
+╭━━〔 *DENETH-MD* 〕━━┈⊷
 ┃◈╭────────────
 ┃◈┃• *⏳ Uptime*: ${uptime}
 ┃◈┃• *📟 Ram usage*: ${ram}
 ┃◈┃• *⚙️ HostName*: ${hostname}
-┃◈┃• *👨‍💻 Owner*: DILA-MD
+┃◈┃• *👨‍💻 Owner*: DENETH MD
 ┃◈┃• *🧬 Version*: 3.0.0 BETA
 ┃◈└───────────
-╰──────────────
-
-> ✦ POWERED BY DILA MD`;
+╰──────────────`;
 
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // SEND FINAL IMAGE
+        // STEP 7 - BUTTONS SETTING
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        await conn.sendMessage(from, {
-            image: { url: `https://i.ibb.co/gXHVbhm/temp-image.jpg` },
-            caption: status,
-            contextInfo: {
-                mentionedJid: [m.sender],
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363429118791328@newsletter',
-                    newsletterName: 'DILA MD',
-                    serverMessageId: 143
+        const myButtons = [
+            { buttonId: '.menu', buttonText: { displayText: '📜 Main Menu' }, type: 1 },
+            { buttonId: '.owner', buttonText: { displayText: '👤 Owner Info' }, type: 1 },
+            { buttonId: '.ping', buttonText: { displayText: '⚡ Bot Speed' }, type: 1 }
+        ];
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // SEND FINAL MESSAGE WITH BUTTONS
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        await conn.sendButtonText(
+            from, 
+            myButtons, 
+            status, 
+            "© Powered By Deneth MD", 
+            mek,
+            {
+                contextInfo: {
+                    mentionedJid: [m.sender],
+                    forwardingScore: 999,
+                    isForwarded: true,
+                    forwardedNewsletterMessageInfo: {
+                        newsletterJid: '120363429118791328@newsletter',
+                        newsletterName: 'DENETH MD',
+                        serverMessageId: 143
+                    }
                 }
             }
-        }, { quoted: mek });
+        );
 
         // Delete loading message
         try {
