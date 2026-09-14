@@ -1,7 +1,8 @@
+const { cmd, commands } = require("../command"); // 👈 cmd error එක හැදීමට මෙය එකතු කලා
 const yts = require("yt-search");
 const axios = require("axios");
 const config = require("../config");
-const { ytmp3 } = require("../lib/functions"); // 👈 වැරැද්ද නිවැරදි කරමින් ytmp3 ඉම්පෝර්ට් කලා
+const { ytmp3 } = require("../lib/functions");
 
 cmd(
   {
@@ -56,7 +57,7 @@ cmd(
         return await danuwa.sendMessage(targetJid, { text: "❌ *Video not found! Please check the name and try again.*", edit: loadingMsg.key });
       }
       
-      const data = search.videos[0]; // නිවැරදිව මුල්ම වීඩියෝව තෝරාගැනීම
+      const data = search.videos[0]; // මුල්ම වීඩියෝව තෝරාගැනීම
       const url = data.url;
 
       // වීඩියෝ විස්තර Format කිරීම
@@ -86,7 +87,7 @@ cmd(
           : durationParts[0] * 60 + durationParts[1];
 
       if (totalSeconds > 1800) {
-        return reply("⏳ *Sorry, audio files longer than 30 minutes are not supported.*");
+        return reply("⏳ *Sorry, video files longer than 30 minutes are not supported.*");
       }
 
       // 5. යූටියුබ් වෙතින් සින්දුව ඩවුන්ලෝඩ් කර ගැනීම
