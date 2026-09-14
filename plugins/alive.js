@@ -2,6 +2,7 @@ const { cmd, commands } = require('../command');
 const os = require("os");
 const { runtime } = require('../lib/functions');
 const { generateWAMessageFromContent, proto } = require('@whiskeysockets/baileys');
+const config = require('../config');
 
 cmd({
     pattern: "alive",
@@ -13,111 +14,12 @@ cmd({
 },
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // STEP 1 - START LOADING
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        const loading = await conn.sendMessage(from, {
-            text: `╭━━〔 *DENETH-MD* 〕━━┈⊷
-┃
-┃  ⏳ *Loading System...*
-┃
-┃  ▱▱▱▱▱▱▱▱▱▱ 0%
-┃
-┃  Please wait...
-┃
-╰━━━━━━━━━━━━━━━━━━━`
-        }, { quoted: mek });
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // STEP 2 - UPTIME
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        await conn.sendMessage(from, {
-            text: `╭━━〔 *DENETH-MD* 〕━━┈⊷
-┃
-┃  ⏳ *Loading Uptime...*
-┃
-┃  ▰▰▱▱▱▱▱▱▱▱ 20%
-┃
-┃  • Uptime: Loading...
-┃
-╰━━━━━━━━━━━━━━━━━━━`,
-            edit: loading.key
-        });
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
+        // පද්ධතියේ විස්තර එකවර ලබා ගැනීම
         const uptime = runtime(process.uptime());
-
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // STEP 3 - RAM
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        await conn.sendMessage(from, {
-            text: `╭━━〔 *DENETH-MD* 〕━━┈⊷
-┃
-┃  📟 *Loading RAM Usage...*
-┃
-┃  ▰▰▰▰▱▱▱▱▱▱ 40%
-┃
-┃  • Uptime: ${uptime}
-┃  • RAM: Loading...
-┃
-╰━━━━━━━━━━━━━━━━━━━`,
-            edit: loading.key
-        });
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
         const ram = `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB / ${(os.totalmem() / 1024 / 1024).toFixed(2)}MB`;
-
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // STEP 4 - HOSTNAME
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        await conn.sendMessage(from, {
-            text: `╭━━〔 *DENETH-MD* 〕━━┈⊷
-┃
-┃  ⚙️ *Loading HostName...*
-┃
-┃  ▰▰▰▰▰▰▱▱▱▱ 60%
-┃
-┃  • Uptime: ${uptime}
-┃  • RAM: ${ram}
-┃  • HostName: Loading...
-┃
-╰━━━━━━━━━━━━━━━━━━━`,
-            edit: loading.key
-        });
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
         const hostname = os.hostname();
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // STEP 5 - OWNER
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        await conn.sendMessage(from, {
-            text: `╭━━〔 *DENETH-MD* 〕━━┈⊷
-┃
-┃  👨‍💻 *Loading Owner...*
-┃
-┃  ▰▰▰▰▰▰▰▰▱▱ 80%
-┃
-┃  • Uptime: ${uptime}
-┃  • RAM: ${ram}
-┃  • HostName: ${hostname}
-┃  • Owner: Loading...
-┃
-╰━━━━━━━━━━━━━━━━━━━`,
-            edit: loading.key
-        });
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // STEP 6 - FINAL TEXT
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        // ප්‍රධාන මැසේජ් එක සකස් කිරීම
         const status = `👋 *HELLO ${pushname} I AM ALIVE NOW*
 
 ╭━━〔 *DENETH-MD* 〕━━┈⊷
@@ -130,41 +32,68 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 ┃◈└───────────
 ╰──────────────`;
 
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        // STEP 7 - NEW TEMPLATE BUTTONS METHOD
-        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        const buttons = [
-            { index: 1, quickReplyButton: { displayText: '📜 Main Menu', id: '.menu' } },
-            { index: 2, quickReplyButton: { displayText: '👤 Owner Info', id: '.owner' } },
-            { index: 3, quickReplyButton: { displayText: '⚡ Bot Speed', id: '.ping' } }
-        ];
+        // 2026 වට්සැප් නව බොත්තම් ක්‍රමවේදය (Native Flow)
+        const buttonParamsJson = JSON.stringify({
+            buttons: [
+                {
+                    name: "quick_reply",
+                    buttonParamsJson: JSON.stringify({
+                        display_text: "📜 Main Menu",
+                        id: `${config.PREFIX}menu`
+                    })
+                },
+                {
+                    name: "quick_reply",
+                    buttonParamsJson: JSON.stringify({
+                        display_text: "👤 Owner Info",
+                        id: `${config.PREFIX}owner`
+                    })
+                },
+                {
+                    name: "quick_reply",
+                    buttonParamsJson: JSON.stringify({
+                        display_text: "⚡ Bot Speed",
+                        id: `${config.PREFIX}ping`
+                    })
+                }
+            ]
+        });
 
         const msg = generateWAMessageFromContent(from, {
             viewOnceMessage: {
                 message: {
-                    templateMessage: {
-                        hydratedTemplate: {
-                            imageMessage: { url: 'https://ibb.co' }, // ඔයාගේ ලස්සන Alive Image එක
-                            hydratedContentText: status,
-                            hydratedFooterText: "© Powered By Deneth MD",
-                            hydratedButtons: buttons
+                    interactiveMessage: proto.Message.InteractiveMessage.fromObject({
+                        body: proto.Message.InteractiveMessage.Body.fromObject({
+                            text: status
+                        }),
+                        footer: proto.Message.InteractiveMessage.Footer.fromObject({
+                            text: "© Powered By Deneth MD"
+                        }),
+                        header: proto.Message.InteractiveMessage.Header.fromObject({
+                            title: "DENETH MD STATUS",
+                            hasMediaAttachment: true,
+                            imageMessage: { url: 'https://ibb.co' } // ඔයා එවපු Alive Image එක
+                        }),
+                        nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+                            buttons: JSON.parse(buttonParamsJson).buttons
+                        }),
+                        contextInfo: {
+                            mentionedJid: [m.sender],
+                            forwardingScore: 999,
+                            isForwarded: true,
+                            forwardedNewsletterMessageInfo: {
+                                newsletterJid: '120363429118791328@newsletter',
+                                newsletterName: 'DENETH MD',
+                                serverMessageId: 143
+                            }
                         }
-                    }
+                    })
                 }
             }
         }, { userJid: conn.user.id, quoted: mek });
 
-        // අලුත් ක්‍රමයට මැසේජ් එක සෙන්ඩ් කිරීම
+        // මැසේජ් එක ක්ෂණිකව සෙන්ඩ් කිරීම
         await conn.relayMessage(from, msg.message, { messageId: msg.key.id });
-
-        // Delete loading message
-        try {
-            await conn.sendMessage(from, {
-                delete: loading.key
-            });
-        } catch (err) {
-            console.log("Loading message delete failed");
-        }
 
     } catch (e) {
         console.error("Error in alive command:", e);
