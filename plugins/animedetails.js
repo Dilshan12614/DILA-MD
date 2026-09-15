@@ -23,7 +23,7 @@ cmd(
       // ඇනිමේ ලින්ක් එකක් දුන්නොත් හෝ නමක් දුන්නොත් එය පිරිසිදු කර ගැනීම
       let animeName = q.trim();
       if (animeName.includes("anime/")) {
-        animeName = animeName.split("anime/").pop().split("/")[0].replace(/-/g, " ");
+        animeName = animeName.split("anime/").pop().split("/").replace(/-/g, " ");
       }
       
       // ඇනිමේ නමේ මුල් අකුරු Capital කිරීම
@@ -34,7 +34,7 @@ cmd(
         text: `🎭 *DENETH-MD Processing Anime:* \`"${animeName}"\`\n> *Fetching details and video file...* ⏳` 
       }, { quoted: mek });
 
-      // 2. ඇනිමේ විස්තර Format කිරීම (බාහිර API වලින් තොරව ස්ථාවරව වැඩ කරයි)
+      // 2. ඇනිමේ විස්තර Format කිරීම
       let desc = `🎭 *DENETH-MD ANIME DOWNLOADER* 🎭
 
 🎬 *Title:* ${animeName}
@@ -58,8 +58,9 @@ cmd(
       // 3. ඔයාගේ Apify සෘජු ඩවුන්ලෝඩ් ලින්ක් එක (Direct Download Link)
       const downloadUrl = "https://apify.com";
 
-      // 4. කෙලින්ම වට්සැප් එකට වීඩියෝ ෆයිල් එක (Document) යැවීම
-      await danuwa.sendMessage(
+      // 4. කෙලින්ම වට්සැප් එකට වීඩියෝ ෆයිල් එක (Document) යැවීම 
+      // (මෙතන තිබ්බ danuwa කියන එක robin ලෙස නිවැරදි කලා 👇)
+      await robin.sendMessage(
         targetJid,
         { 
           document: { url: downloadUrl }, 
