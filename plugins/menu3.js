@@ -1,72 +1,22 @@
 const { cmd, commands } = require("../command");
 const config = require("../config");
-const { runtime } = require("../lib/functions");
 
 cmd(
   {
     pattern: "menu3",
-    alias: ["listmenu"],
+    alias: ["getmenu3"],
     react: "📔",
-    desc: "Get force interactive block message menu",
+    desc: "Get force interactive block message welcome menu",
     category: "main",
     filename: __filename,
   },
 
-  async (conn, mek, m, { from, sender, pushname, reply }) => {
+  async (conn, mek, m, { from, sender, reply }) => {
     try {
 
-      // ==========================================
-      // AUTO COMMAND CATEGORIES
-      // ==========================================
-      const categories = {};
-
-      for (let i = 0; i < commands.length; i++) {
-        const cmdData = commands[i];
-        if (cmdData.pattern && !cmdData.dontAddCommandList) {
-          const category = (cmdData.category || "other").toLowerCase();
-          if (!categories[category]) {
-            categories[category] = [];
-          }
-          categories[category].push(`${config.PREFIX}${cmdData.pattern}`);
-        }
-      }
-
-      // ==========================================
-      // MENU CONTENT GENERATOR
-      // ==========================================
-      let madeMenu = `
-╭━━━〔 🚀DENETH 𝐌𝐃🚀〕━━━╮
-┃
-┃  ✨ *WELCOME TO DENETH MD* ✨
-┃
-┃  🤖 Your Personal WhatsApp Assistant
-┃  ⚡ Fast • Smart • Powerful
-┃  🛠️ Multi-Feature Bot
-┃
-╰━━━━━━━━━━━━━━━━━━━━━
-
-╭━━〔 🤖𝐁𝐎𝐓 𝐈𝐍𝐅𝐎🤖 〕━━━╮
-┃
-┃  👋 Hello, *${pushname || "User"}*
-┃  📚 Commands : *${commands.length}*
-┃  🔰 Prefix   : *${config.PREFIX}*
-┃  ⏱️ Uptime   : *${runtime(process.uptime())}*
-┃
-╰━━━━━━━━━━━━━━━━━━━━━\n`;
-
-      for (const [category, cmdList] of Object.entries(categories)) {
-        madeMenu += `\n╭─⊳⋅📂 *${category.toUpperCase()}* ⋅⊲─╮\n`;
-        for (const command of cmdList) {
-          madeMenu += `┃ ⌬ ${command}\n`;
-        }
-        madeMenu += `╰─⊲⋅════════━━━━━┈⊷\n`;
-      }
-
-      madeMenu += `\n> ⚡ *POWERED BY DENETH MD* ⚡`;
-
-      // ==========================================
+      // =================================================================
       // FORCE INTERACTIVE STRUCTURE (NO BUTTONS, SHOWS VERSION ERROR)
-      // ==========================================
+      // =================================================================
       const { generateWAMessageFromContent, proto } = require("@whiskeysockets/baileys");
 
       const msg = generateWAMessageFromContent(from, {
@@ -78,13 +28,13 @@ cmd(
                   },
                   interactiveMessage: proto.Message.InteractiveMessage.fromObject({
                       body: proto.Message.InteractiveMessage.Body.fromObject({
-                          text: madeMenu
+                          text: "Hello welcome to DENETH-MD" // 👈 ඔයා ඉල්ලපු ප්‍රධාන වැකිය පමණක් ඇතුළත් කළා
                       }),
                       footer: proto.Message.InteractiveMessage.Footer.fromObject({
                           text: "© Powered By Deneth MD"
                       }),
                       header: proto.Message.InteractiveMessage.Header.fromObject({
-                          title: "✨ *DENETH MD COMMAND MENU* ✨",
+                          title: "✨ DENETH MD SYSTEM ✨",
                           hasMediaAttachment: false
                       }),
                       carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
@@ -110,10 +60,10 @@ cmd(
                   })
               }
           }
-      }, { userJid: conn.user.jid, quoted: mek }); // 👈 robin වෙනුවට conn ලෙස නිවැරදි කළා
+      }, { userJid: conn.user.jid, quoted: mek }); // conn ලෙස නිවැරදි කර ඇත
 
       // මැසේජ් එක වට්ස්ඇප් වෙත බලෙන් යැවීම
-      await conn.relayMessage(from, msg.message, { messageId: msg.key.id }); // 👈 robin වෙනුවට conn ලෙස නිවැරදි කළා
+      await conn.relayMessage(from, msg.message, { messageId: msg.key.id }); // conn ලෙස නිවැරදි කර ඇත
 
     } catch (e) {
       console.error("MENU3 ERROR:", e);
