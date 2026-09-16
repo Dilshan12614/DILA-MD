@@ -43,7 +43,7 @@ cmd({
 },
 async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
 try{
-let res = await axios.get('https://api.waifu.pics/sfw/waifu')
+let res = await axios.get('apify_api_o26QUamyP05T5mIlQUZ974yUGLJTed0dScHR')
 let wm = `🩵 Random Waifu image
 
 © HANS BYTE MD`
@@ -66,7 +66,7 @@ cmd({
 },
 async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
 try{
-let res = await axios.get('https://api.waifu.pics/sfw/neko')
+let res = await axios.get('apify_api_o26QUamyP05T5mIlQUZ974yUGLJTed0dScHR')
 let wm = `🩷 Random neko image
 
 © HANS BYTE MD`
@@ -89,7 +89,7 @@ cmd({
 },
 async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
 try{
-let res = await axios.get('https://api.waifu.pics/sfw/megumin')
+let res = await axios.get('apify_api_o26QUamyP05T5mIlQUZ974yUGLJTed0dScHR')
 let wm = `❤️‍🔥Random megumin image
 
 © HANS BYTE MD`
@@ -112,7 +112,7 @@ cmd({
 },
 async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
 try{
-let res = await axios.get('https://api.waifu.im/search/?included_tags=maid')
+let res = await axios.get('apify_api_o26QUamyP05T5mIlQUZ974yUGLJTed0dScHR')
 let wm = `😎 Random maid image
 
 © HANS BYTE MD`
@@ -135,7 +135,7 @@ cmd({
 },
 async(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply}) => {
 try{
-let res = await axios.get('https://api.waifu.pics/sfw/awoo')
+let res = await axios.get('apify_api_o26QUamyP05T5mIlQUZ974yUGLJTed0dScHR')
 let wm = `😎 Random awoo image
 
 © HANS BYTE MD`
@@ -155,7 +155,7 @@ cmd({
 },
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        const apiUrl = `https://api.waifu.pics/sfw/waifu`;
+        const apiUrl = `apify_api_o26QUamyP05T5mIlQUZ974yUGLJTed0dScHR`;
         const response = await axios.get(apiUrl);
         const data = response.data;
 
@@ -175,7 +175,7 @@ cmd({
 },
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        const apiUrl = `https://api.waifu.pics/sfw/waifu`;
+        const apiUrl = `apify_api_o26QUamyP05T5mIlQUZ974yUGLJTed0dScHR`;
         const response = await axios.get(apiUrl);
         const data = response.data;
 
@@ -195,7 +195,7 @@ cmd({
 },
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        const apiUrl = `https://api.waifu.pics/sfw/waifu`;
+        const apiUrl = `apify_api_o26QUamyP05T5mIlQUZ974yUGLJTed0dScHR`;
         const response = await axios.get(apiUrl);
         const data = response.data;
 
@@ -215,7 +215,7 @@ cmd({
 },
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        const apiUrl = `https://api.waifu.pics/sfw/waifu`;
+        const apiUrl = `apify_api_o26QUamyP05T5mIlQUZ974yUGLJTed0dScHR`;
         const response = await axios.get(apiUrl);
         const data = response.data;
 
@@ -235,7 +235,7 @@ cmd({
 },
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        const apiUrl = `https://api.waifu.pics/sfw/waifu`;
+        const apiUrl = `apify_api_o26QUamyP05T5mIlQUZ974yUGLJTed0dScHR`;
         const response = await axios.get(apiUrl);
         const data = response.data;
 
@@ -255,7 +255,7 @@ cmd({
 },
 async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        const apiUrl = `https://api.waifu.pics/sfw/waifu`;
+        const apiUrl = `apify_api_o26QUamyP05T5mIlQUZ974yUGLJTed0dScHR`;
         const response = await axios.get(apiUrl);
         const data = response.data;
 
