@@ -117,45 +117,17 @@ const port = process.env.PORT || 8000;
   }
   })
   conn.ev.on('creds.update', saveCreds)
-// ====== FORCE INTERACTIVE BLOCK MESSAGE INJECTOR ======
 
-// 184 පේළියේ තිබූ වැරැද්ද සම්පූර්ණයෙන්ම නිවැරදි කළ ආරක්ෂිත කොටස
-if (typeof conn !== 'undefined' && conn && typeof conn.sendMessage === 'function') {
-    const originalSendMessage = conn.sendMessage;
-    conn.sendMessage = async (jid, content, options) => {
-        if (content && content.text) {
-            const modifiedContent = await parseOuterMessage(content);
-            return originalSendMessage.call(conn, jid, modifiedContent, options);
-        }
-        return originalSendMessage.call(conn, jid, content, options);
-    };
-}
+  //==============================
 
-  // ====== ANTI-DELETE FUNCTION ======
-conn.ev.on('messages.update', async (chatUpdate) => {
-    for (const key of chatUpdate) {
-        if (key.update.update === 'REVOKE') {
-            if (config.ANTI_DELETE === 'true') {
-                // මැකූ මැසේජ් එක මතකයෙන් ලබා ගැනීම
-                const deletedMessage = await conn.loadMessage(key.key.remoteJid, key.key.id);
-                if (!deletedMessage) return;
-
-                const from = key.key.remoteJid;
-                const participant = key.key.participant || key.key.remoteJid;
-                
-                let textMsg = `🍁 *ANTI-DELETE DETECTED* 🍁\n\n`;
-                textMsg += `👤 *User:* @${participant.split('@')[0]}\n`;
-                
-                // මැකූ මැසේජ් එක නැවත එවීමට අදාළ චැට් එක තෝරාගැනීම
-                const targetChat = config.ANTI_DEL_PATH === 'same' ? from : conn.user.id;
-
-                await conn.sendMessage(targetChat, { text: textMsg, mentions: [participant] }, { quoted: deletedMessage });
-                await conn.forwardMessage(targetChat, deletedMessage, false);
-            }
-        }
+  conn.ev.on('messages.update', async updates => {
+    for (const update of updates) {
+      if (update.update.message === null) {
+        console.log("Delete Detected:", JSON.stringify(update, null, 2));
+        await AntiDelete(conn, updates);
+      }
     }
-});
-
+  });
   //============================== 
           
   //=============readstatus=======
@@ -192,23 +164,6 @@ conn.ev.on('messages.update', async (chatUpdate) => {
   const text = `${config.AUTO_STATUS_MSG}`
   await conn.sendMessage(user, { text: text, react: { text: '💜', key: mek.key } }, { quoted: mek })
             }
-
-  // ===== BUTTON & LIST RESPONSE READER BY DENETH-MD =====
-  if (mek.message) {
-      if (mek.message.buttonsResponseMessage) {
-          mek.message.conversation = mek.message.buttonsResponseMessage.selectedButtonId;
-      } else if (mek.message.listResponseMessage) {
-          mek.message.conversation = mek.message.listResponseMessage.singleSelectReply.selectedRowId;
-      } else if (mek.message.templateButtonReplyMessage) {
-          mek.message.conversation = mek.message.templateButtonReplyMessage.selectedId;
-      } else if (mek.message.interactiveResponseMessage) {
-          const responseData = JSON.parse(mek.message.interactiveResponseMessage.nativeFlowResponseMessage.paramsJson);
-          mek.message.conversation = responseData.id;
-      }
-  }
-  // ======================================================
-
-            
             await Promise.all([
               saveMessage(mek),
             ]);
@@ -217,15 +172,8 @@ conn.ev.on('messages.update', async (chatUpdate) => {
   const content = JSON.stringify(mek.message)
   const from = mek.key.remoteJid
   const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : []
-  const body = (type === 'conversation') ? mek.message.conversation : 
-             (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : 
-             (type === 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : 
-             (type === 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : 
-             (type === 'templateButtonReplyMessage') ? mek.message.templateButtonReplyMessage.selectedId : 
-             (type === 'buttonsResponseMessage') ? mek.message.buttonsResponseMessage.selectedButtonId : 
-             (type === 'interactiveResponseMessage') ? JSON.parse(mek.message.interactiveResponseMessage.nativeFlowResponseMessage.paramsJson).id : '';
-
-  const isCmd = body.startsWith(config.PREFIX)
+  const body = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : ''
+  const isCmd = body.startsWith(prefix)
   var budy = typeof mek.text == 'string' ? mek.text : false;
   const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
   const args = body.trim().split(/ +/).slice(1)
