@@ -135,7 +135,7 @@ cmd(
       ];
 
       // ==========================================
-      // GENERATE INTERACTIVE BUTTON MESSAGE WITH IMAGE
+      // GENERATE INTERACTIVE BUTTON MESSAGE
       // ==========================================
       const { generateWAMessageFromContent, proto } = require("@whiskeysockets/baileys");
 
@@ -155,8 +155,7 @@ cmd(
                       }),
                       header: proto.Message.InteractiveMessage.Header.fromObject({
                           title: "✨ *DENETH MD COMMAND MENU* ✨",
-                          hasMediaAttachment: true,
-                          imageMessage: (await robin.prepareMessageMedia({ image: { url: "https://telegra.ph" } }, { upload: robin.waUploadToServer })).imageMessage
+                          hasMediaAttachments: false
                       }),
                       carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
                           cards: [
@@ -183,9 +182,10 @@ cmd(
           }
       }, { userJid: robin.user.jid, quoted: mek });
 
-      // ==========================================
-      // SEND REPLAY MESSAGE
-      // ==========================================
+      // पहले इमेज भेजें (First send the menu logo image)
+      await robin.sendMessage(from, { image: { url: "https://telegra.ph" } }, { quoted: mek });
+
+      // उसके बाद बटन वाला मैसेज भेजें (Then send the interactive button message)
       await robin.relayMessage(from, msg.message, { messageId: msg.key.id });
 
     } catch (e) {
