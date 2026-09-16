@@ -3,55 +3,50 @@ const config = require("../config");
 
 cmd(
   {
-    pattern: "menu",
-    alias: ["getmenu"],
-    react: "📔",
-    desc: "Get simple welcome menu",
+    pattern: "menu3",
+    alias: ["listmenu"],
+    react: "📁",
+    desc: "Get beautiful list button menu",
     category: "main",
     filename: __filename,
   },
 
-  async (
-    robin,
-    mek,
-    m,
-    {
-      from,
-      sender,
-      reply,
-    }
-  ) => {
+  async (robin, mek, m, { from, sender, reply }) => {
     try {
+      const { generateWAMessageFromContent, proto } = require("@whiskeysockets/baileys");
 
-      // ==========================================
-      // SEND ONLY IMAGE WITH WELCOME TEXT
-      // ==========================================
-      await robin.sendMessage(
-        from,
+      // ස්ක්‍රීන්ෂොට් එකේ තිබුණු විදිහටම ලිස්ට් එකේ Options (තේරීම්) සකස් කිරීම
+      const sections = [
         {
-          image: {
-            url: "https://telegra.ph", 
-          },
-          caption: "Hello welcome to DENETH-MD",
-          contextInfo: {
-            mentionedJid: sender ? [sender] : [],
-            forwardingScore: 1000,
-            isForwarded: true,
-            forwardedNewsletterMessageInfo: {
-              newsletterJid: "120363429118791328@newsletter",
-              newsletterName: "DENETH 𝐌𝐃",
-              serverMessageId: 143,
-            },
-          },
-        },
-        {
-          quoted: mek,
+          title: "🎬 Select Movie / Video Quality",
+          rows: [
+            { title: "1. 📁 Video (Document) • 720p", rowId: `${config.PREFIX}vid720`, description: "Download in SD quality" },
+            { title: "2. 📁 Video (Document) • 1080p", rowId: `${config.PREFIX}vid1080`, description: "Download in Full HD quality" },
+            { title: "3. 📁 Video (Document) • 2560p", rowId: `${config.PREFIX}vid2560`, description: "Download in Ultra HD 2K quality" }
+          ]
         }
-      );
+      ];
+
+      // ලිස්ට් මැසේජ් එකේ ප්‍රධාන ව්‍යුහය
+      const listMessage = {
+        text: "Reply to this message with a number (1-3)\n🔄 You can select multiple options!", // ඔයාගේ ස්ක්‍රීන්ෂොට් එකේ තිබුණු ප්‍රධාන වැකිය
+        footer: "│ © Powered by LUXALGO ♡", // ඔයාගේ ස්ක්‍රීන්ෂොට් එකේ තිබුණු Footer එක
+        title: "✨ *DENETH MD VIDEO DOWNLOADER* ✨",
+        buttonText: "Select Quality 🚀", // බොත්තම මත දිස්වන වැකිය
+        sections: sections,
+        contextInfo: {
+          mentionedJid: sender ? [sender] : [],
+          forwardingScore: 1000,
+          isForwarded: true
+        }
+      };
+
+      // ලිස්ට් බටන් මැසේජ් එක වට්ස්ඇප් වෙත යැවීම
+      await robin.sendMessage(from, listMessage, { quoted: mek });
 
     } catch (e) {
-      console.error("MENU ERROR:", e);
-      reply(`❌ Menu Error\n\n${e.message || e}`);
+      console.error("MENU3 ERROR:", e);
+      reply(`❌ Menu3 Error\n\n${e.message || e}`);
     }
   }
 );
