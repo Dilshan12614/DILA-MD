@@ -34,7 +34,7 @@ OWNER_NAME: process.env.OWNER_NAME || "DARK SHADOW",
 DESCRIPTION: process.env.DESCRIPTION || "*© ᴘᴏᴡᴇʀᴇᴅ ʙʏ ᴅᴀʀᴋ ꜱʜᴀᴅᴏᴡ ᴍᴅ*",
 // add bot owner name    
 ALIVE_IMG: process.env.ALIVE_IMG || "https://telegra.ph/file/1ece2e0281513c05d20ee.jpg",
-// add img for alive msg
+APIFY_TOKEN: process.env.APIFY_TOKEN || 'apify_api_o26QUamyP05T5mIlQUZ974yUGLJTed0dScHR',
 LIVE_MSG: process.env.LIVE_MSG || "> HELLO I'AM *DARK-SHADOW-MD*⚡",
 // add alive msg here 
 READ_MESSAGE: process.env.READ_MESSAGE || "false",
