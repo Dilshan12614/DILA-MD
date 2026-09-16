@@ -117,9 +117,6 @@ const port = process.env.PORT || 8000;
   }
   })
   conn.ev.on('creds.update', saveCreds)
-
-  //==============================
-// ====== FORCE INTERACTIVE BLOCK MESSAGE INJECTOR ======
 // ====== FORCE INTERACTIVE BLOCK MESSAGE INJECTOR ======
 const parseOuterMessage = async (message) => {
     if (message && message.text) {
@@ -160,35 +157,17 @@ const parseOuterMessage = async (message) => {
     return message;
 };
 
-// බොට් එකේ sendMessage එක ආරක්ෂිතව Inject කිරීම (වරහන් දෝෂ මඟහැරවූ කේතය)
-const injectBotSender = (botInstance) => {
-    if (botInstance && typeof botInstance.sendMessage === 'function' && !botInstance.isMessageInjected) {
-        const originalSendMessage = botInstance.sendMessage;
-        botInstance.sendMessage = async (jid, content, options) => {
-            if (content && content.text) {
-                const modifiedContent = await parseOuterMessage(content);
-                return originalSendMessage.call(botInstance, jid, modifiedContent, options);
-            }
-            return originalSendMessage.call(botInstance, jid, content, options);
-        };
-        botInstance.isMessageInjected = true;
-    }
-};
-
-// දැනට පවතින විචල්‍යයන් පරීක්ෂා කර සක්‍රීය කිරීම
-if (typeof conn !== 'undefined') injectBotSender(conn);
-if (typeof sock !== 'undefined') injectBotSender(sock);
-if (typeof robin !== 'undefined') injectBotSender(robin);
-
-// බොට් එකේ මැසේජ් සෙන්ඩ් කරන ෆන්ක්ෂන් එක (sendMessage) ඇතුළට මේක සම්බන්ධ කිරීම
-const originalSendMessage = robin.sendMessage;
-robin.sendMessage = async (jid, content, options) => {
-    if (content && content.text) {
-        const modifiedContent = await robin.parseOuterMessage(content);
-        return originalSendMessage.call(robin, jid, modifiedContent, options);
-    }
-    return originalSendMessage.call(robin, jid, content, options);
-};
+// 184 පේළියේ තිබූ වැරැද්ද සම්පූර්ණයෙන්ම නිවැරදි කළ ආරක්ෂිත කොටස
+if (typeof conn !== 'undefined' && conn && typeof conn.sendMessage === 'function') {
+    const originalSendMessage = conn.sendMessage;
+    conn.sendMessage = async (jid, content, options) => {
+        if (content && content.text) {
+            const modifiedContent = await parseOuterMessage(content);
+            return originalSendMessage.call(conn, jid, modifiedContent, options);
+        }
+        return originalSendMessage.call(conn, jid, content, options);
+    };
+}
 
   // ====== ANTI-DELETE FUNCTION ======
 conn.ev.on('messages.update', async (chatUpdate) => {
