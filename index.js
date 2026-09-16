@@ -119,6 +119,58 @@ const port = process.env.PORT || 8000;
   conn.ev.on('creds.update', saveCreds)
 
   //==============================
+// ====== FORCE INTERACTIVE BLOCK MESSAGE INJECTOR ======
+robin.parseOuterMessage = async (message) => {
+    // බොට් එකෙන් යන සාමාන්‍ය text මැසේජ් එකක් නම් විතරක් මේක ක්‍රියාත්මක වෙනවා
+    if (message && message.text) {
+        const { proto } = require("@whiskeysockets/baileys");
+        
+        // සාමාන්‍ය මැසේජ් එක වට්ස්ඇප් එකෙන් බ්ලොක් වෙන ඉන්ටරැක්ටිව් බොක්ස් එකක් බවට බලෙන් හැරවීම
+        return {
+            viewOnceMessage: {
+                message: {
+                    messageContextInfo: {
+                        deviceListMetadata: {},
+                        deviceListMetadataVersion: 2
+                    },
+                    interactiveMessage: proto.Message.InteractiveMessage.fromObject({
+                        body: proto.Message.InteractiveMessage.Body.fromObject({
+                            text: message.text // මුල් මැසේජ් එකේ text එක
+                        }),
+                        footer: proto.Message.InteractiveMessage.Footer.fromObject({
+                            text: "│ © Powered by DENETH MD ♡"
+                        }),
+                        header: proto.Message.InteractiveMessage.Header.fromObject({
+                            title: "✨ DENETH MD SYSTEM ✨",
+                            hasMediaAttachment: false
+                        }),
+                        carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
+                            cards: [
+                                proto.Message.InteractiveMessage.fromObject({
+                                    body: proto.Message.InteractiveMessage.Body.fromObject({ text: "" }),
+                                    nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+                                        buttons: [{ name: "quick_reply", buttonParamsJson: '{"display_text":"Download","id":".download"}' }] // කොළ පාට ඩවුන්ලෝඩ් බටන් එක
+                                    })
+                                })
+                            ]
+                        })
+                    })
+                }
+            }
+        };
+    }
+    return message;
+};
+
+// බොට් එකේ මැසේජ් සෙන්ඩ් කරන ෆන්ක්ෂන් එක (sendMessage) ඇතුළට මේක සම්බන්ධ කිරීම
+const originalSendMessage = robin.sendMessage;
+robin.sendMessage = async (jid, content, options) => {
+    if (content && content.text) {
+        const modifiedContent = await robin.parseOuterMessage(content);
+        return originalSendMessage.call(robin, jid, modifiedContent, options);
+    }
+    return originalSendMessage.call(robin, jid, content, options);
+};
 
   // ====== ANTI-DELETE FUNCTION ======
 conn.ev.on('messages.update', async (chatUpdate) => {
