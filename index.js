@@ -118,44 +118,6 @@ const port = process.env.PORT || 8000;
   })
   conn.ev.on('creds.update', saveCreds)
 // ====== FORCE INTERACTIVE BLOCK MESSAGE INJECTOR ======
-const parseOuterMessage = async (message) => {
-    if (message && message.text) {
-        const { proto } = require("@whiskeysockets/baileys");
-        return {
-            viewOnceMessage: {
-                message: {
-                    messageContextInfo: {
-                        deviceListMetadata: {},
-                        deviceListMetadataVersion: 2
-                    },
-                    interactiveMessage: proto.Message.InteractiveMessage.fromObject({
-                        body: proto.Message.InteractiveMessage.Body.fromObject({
-                            text: message.text
-                        }),
-                        footer: proto.Message.InteractiveMessage.Footer.fromObject({
-                            text: "│ © Powered by DENETH MD ♡"
-                        }),
-                        header: proto.Message.InteractiveMessage.Header.fromObject({
-                            title: "✨ DENETH MD SYSTEM ✨",
-                            hasMediaAttachment: false
-                        }),
-                        carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
-                            cards: [
-                                proto.Message.InteractiveMessage.fromObject({
-                                    body: proto.Message.InteractiveMessage.Body.fromObject({ text: "" }),
-                                    nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
-                                        buttons: [{ name: "quick_reply", buttonParamsJson: '{"display_text":"Download","id":".download"}' }]
-                                    })
-                                })
-                            ]
-                        })
-                    })
-                }
-            }
-        };
-    }
-    return message;
-};
 
 // 184 පේළියේ තිබූ වැරැද්ද සම්පූර්ණයෙන්ම නිවැරදි කළ ආරක්ෂිත කොටස
 if (typeof conn !== 'undefined' && conn && typeof conn.sendMessage === 'function') {
