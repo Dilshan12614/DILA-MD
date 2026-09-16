@@ -120,12 +120,11 @@ const port = process.env.PORT || 8000;
 
   //==============================
 // ====== FORCE INTERACTIVE BLOCK MESSAGE INJECTOR ======
-robin.parseOuterMessage = async (message) => {
-    // බොට් එකෙන් යන සාමාන්‍ය text මැසේජ් එකක් නම් විතරක් මේක ක්‍රියාත්මක වෙනවා
+// ====== FORCE INTERACTIVE BLOCK MESSAGE INJECTOR ======
+const parseOuterMessage = async (message) => {
     if (message && message.text) {
         const { proto } = require("@whiskeysockets/baileys");
         
-        // සාමාන්‍ය මැසේජ් එක වට්ස්ඇප් එකෙන් බ්ලොක් වෙන ඉන්ටරැක්ටිව් බොක්ස් එකක් බවට බලෙන් හැරවීම
         return {
             viewOnceMessage: {
                 message: {
@@ -135,7 +134,7 @@ robin.parseOuterMessage = async (message) => {
                     },
                     interactiveMessage: proto.Message.InteractiveMessage.fromObject({
                         body: proto.Message.InteractiveMessage.Body.fromObject({
-                            text: message.text // මුල් මැසේජ් එකේ text එක
+                            text: message.text
                         }),
                         footer: proto.Message.InteractiveMessage.Footer.fromObject({
                             text: "│ © Powered by DENETH MD ♡"
@@ -149,7 +148,7 @@ robin.parseOuterMessage = async (message) => {
                                 proto.Message.InteractiveMessage.fromObject({
                                     body: proto.Message.InteractiveMessage.Body.fromObject({ text: "" }),
                                     nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
-                                        buttons: [{ name: "quick_reply", buttonParamsJson: '{"display_text":"Download","id":".download"}' }] // කොළ පාට ඩවුන්ලෝඩ් බටන් එක
+                                        buttons: [{ name: "quick_reply", buttonParamsJson: '{"display_text":"Download","id":".download"}' }]
                                     })
                                 })
                             ]
@@ -158,6 +157,31 @@ robin.parseOuterMessage = async (message) => {
                 }
             }
         };
+    }
+    return message;
+};
+
+// සම්බන්ධතාවය ස්ථාපිත වූ පසු ක්‍රියාත්මක වන පරිදි sendMessage එක Inject කිරීම
+if (typeof conn !== 'undefined') {
+    const originalSendMessage = conn.sendMessage;
+    conn.sendMessage = async (jid, content, options) => {
+        if (content && content.text) {
+            const modifiedContent = await parseOuterMessage(content);
+            return originalSendMessage.call(conn, jid, modifiedContent, options);
+        }
+        return originalSendMessage.call(conn, jid, content, options);
+    };
+} else if (typeof sock !== 'undefined') {
+    const originalSendMessage = sock.sendMessage;
+    sock.sendMessage = async (jid, content, options) => {
+        if (content && content.text) {
+            const modifiedContent = await parseOuterMessage(content);
+            return originalSendMessage.call(sock, jid, modifiedContent, options);
+        }
+        return originalSendMessage.call(sock, jid, content, options);
+    };
+}
+
     }
     return message;
 };
