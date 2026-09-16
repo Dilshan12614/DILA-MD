@@ -72,6 +72,9 @@ cmd(
 ✦━━━━━━━━━━━━━━━━━━━━━
            🧑‍💻*DENETH-𝐌𝐃*🧑‍💻  
 ✦━━━━━━━━━━━━━━━━━━━━━
+
+> *POWERED BY DANUWA*
+
 `;
 
       // ==========================================
@@ -87,47 +90,108 @@ cmd(
         madeMenu += `╰─⊲⋅════════━━━━━┈⊷\n\n`;
       }
 
-      madeMenu += `> ⚡*POWERED BY DENETH MD*⚡`;
+      // ==========================================
+      // YOUR CUSTOM TEXT ADDED HERE 
+      // ==========================================
+      madeMenu += `✨ *Hello WELCOM TO DENETH-MD* ✨\n\n`;
 
       // ==========================================
-      // 100% WORKING HYDRATED BUTTONS STRUCTURE
+      // FOOTER
       // ==========================================
-      const templateButtons = [
-        {
-          index: 1,
-          urlButton: {
-            displayText: '🧑‍💻 Contact Owner',
-            url: `https://wa.me{config.OWNER_NUMBER}`
+      madeMenu += `
+╭━━━〔 📢 𝐍𝐄𝐖𝐒𝐋𝐄𝐓𝐓𝐄Ｒ 〕━━━╮
+┃
+┃        ✦ 𝐃𝐄𝐍𝐄𝐓𝐇 𝐌𝐃 ✦
+┃
+┃   🚀 *Stay Connected With Us*
+┃   💫 *Updates • Features • News*
+┃
+╰━━━━━━━━━━━━━━━━━━━━━
+
+        
+> ⚡*POWERED BY DENETH MD*⚡
+`;
+
+      // ==========================================
+      // BUTTONS SETUP
+      // ==========================================
+      const buttons = [
+          { 
+              name: 'quick_reply', 
+              buttonParamsJson: JSON.stringify({ 
+                  display_text: '📜 Main Menu', 
+                  id: `${config.PREFIX}menu` 
+              }) 
+          },
+          { 
+              name: 'quick_reply', 
+              buttonParamsJson: JSON.stringify({ 
+                  display_text: '⚡ Alive Check', 
+                  id: `${config.PREFIX}alive` 
+              }) 
+          },
+          { 
+              name: 'quick_reply', 
+              buttonParamsJson: JSON.stringify({ 
+                  display_text: '🧑‍💻 Owner Info', 
+                  id: `${config.PREFIX}owner` 
+              }) 
           }
-        },
-        {
-          index: 2,
-          callButton: {
-            displayText: '📞 Call Owner',
-            phoneNumber: `${config.OWNER_NUMBER}`
-          }
-        }
       ];
 
       // ==========================================
-      // SEND HYDRATED MESSAGE WITH IMAGE
+      // GENERATE INTERACTIVE BUTTON MESSAGE
       // ==========================================
-      await robin.sendMessage(from, {
-        image: { url: "https://telegra.ph" },
-        caption: madeMenu,
-        footer: "© POWERED BY DENETH MD",
-        templateButtons: templateButtons,
-        contextInfo: {
-          mentionedJid: sender ? [sender] : [],
-          forwardingScore: 1000,
-          isForwarded: true,
-          forwardedNewsletterMessageInfo: {
-            newsletterJid: "120363429118791328@newsletter",
-            newsletterName: "DENETH 𝐌𝐃",
-            serverMessageId: 143
+      const { generateWAMessageFromContent, proto } = require("@whiskeysockets/baileys");
+
+      const msg = generateWAMessageFromContent(from, {
+          viewOnceMessage: {
+              message: {
+                  messageContextInfo: {
+                      deviceListMetadata: {},
+                      deviceListMetadataVersion: 2
+                  },
+                  interactiveMessage: proto.Message.InteractiveMessage.fromObject({
+                      body: proto.Message.InteractiveMessage.Body.fromObject({
+                          text: madeMenu
+                      }),
+                      footer: proto.Message.InteractiveMessage.Footer.fromObject({
+                          text: "© POWERED BY DENETH MD"
+                      }),
+                      header: proto.Message.InteractiveMessage.Header.fromObject({
+                          title: "✨ *DENETH MD COMMAND MENU* ✨",
+                          hasMediaAttachments: false
+                      }),
+                      carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
+                          cards: [
+                              proto.Message.InteractiveMessage.fromObject({
+                                  body: proto.Message.InteractiveMessage.Body.fromObject({ text: "" }),
+                                  nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+                                      buttons: buttons
+                                  })
+                              })
+                          ]
+                      }),
+                      contextInfo: {
+                          mentionedJid: sender ? [sender] : [],
+                          forwardingScore: 1000,
+                          isForwarded: true,
+                          forwardedNewsletterMessageInfo: {
+                              newsletterJid: "120363429118791328@newsletter",
+                              newsletterName: "DENETH 𝐌𝐃",
+                              serverMessageId: 143
+                          }
+                      }
+                  })
+              }
           }
-        }
-      }, { quoted: mek });
+      }, { userJid: robin.user.jid, quoted: mek });
+
+      // पहले इमेज भेजें (First send the menu logo image)
+      await robin.sendMessage(from, { image: { url: "https://telegra.ph" } }, { quoted: mek });
+
+      // उसके बाद बटन वाला मैसेज भेजें (Then send the interactive button message)
+      await robin.relayMessage(from, msg.message, { messageId: msg.key.id });
 
     } catch (e) {
       console.error("MENU ERROR:", e);
