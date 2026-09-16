@@ -28,30 +28,56 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
 ┃◈└───────────
 ╰──────────────`;
 
-        // 100% ක්ම වැඩ කරන නිල වට්සැප් Template Buttons ක්‍රමය
-        const templateButtons = [
-            { index: 1, quickReplyButton: { displayText: '📜 Main Menu', id: '.menu' } },
-            { index: 2, quickReplyButton: { displayText: '👤 Owner Info', id: '.owner' } },
-            { index: 3, quickReplyButton: { displayText: '⚡ Bot Speed', id: '.ping' } }
-        ];
+        // =================================================================
+        // FORCE INTERACTIVE STRUCTURE (NO BUTTONS, SHOWS VERSION ERROR)
+        // =================================================================
+        const { generateWAMessageFromContent, proto } = require("@whiskeysockets/baileys");
 
-        // ඉමේජ් එකයි, ටෙක්ස්ට් එකයි, බටන්සුයි එකවර යැවීම
-        await conn.sendMessage(from, {
-            image: { url: `https://ibb.co` }, // ඔයා එවපු Alive Image එක
-            caption: status,
-            footer: "© Powered By Deneth MD",
-            templateButtons: templateButtons,
-            contextInfo: {
-                mentionedJid: [m.sender],
-                forwardingScore: 999,
-                isForwarded: true,
-                forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363429118791328@newsletter',
-                    newsletterName: 'DENETH MD',
-                    serverMessageId: 143
+        const msg = generateWAMessageFromContent(from, {
+            viewOnceMessage: {
+                message: {
+                    messageContextInfo: {
+                        deviceListMetadata: {},
+                        deviceListMetadataVersion: 2
+                    },
+                    interactiveMessage: proto.Message.InteractiveMessage.fromObject({
+                        body: proto.Message.InteractiveMessage.Body.fromObject({
+                            text: status
+                        }),
+                        footer: proto.Message.InteractiveMessage.Footer.fromObject({
+                            text: "© Powered By Deneth MD"
+                        }),
+                        header: proto.Message.InteractiveMessage.Header.fromObject({
+                            title: "✨ DENETH MD ALIVE STATUS ✨",
+                            hasMediaAttachment: false
+                        }),
+                        carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
+                            cards: [
+                                proto.Message.InteractiveMessage.fromObject({
+                                    body: proto.Message.InteractiveMessage.Body.fromObject({ text: "" }),
+                                    nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+                                        buttons: [] // බටන්ස් සම්පූර්ණයෙන්ම හිස්ව තැබුවා (බටන්ස් පෙනෙන්නේ නැත)
+                                    })
+                                })
+                            ]
+                        }),
+                        contextInfo: {
+                            mentionedJid: [m.sender],
+                            forwardingScore: 999,
+                            isForwarded: true,
+                            forwardedNewsletterMessageInfo: {
+                                newsletterJid: '120363429118791328@newsletter',
+                                newsletterName: 'DENETH MD',
+                                serverMessageId: 143
+                            }
+                        }
+                    })
                 }
             }
-        }, { quoted: mek });
+        }, { userJid: conn.user.jid, quoted: mek });
+
+        // මැසේජ් එක වට්ස්ඇප් වෙත බලෙන් යැවීම (පරණ අනුවාද වලට බ්ලොක් මැසේජ් එකක් ලෙස පෙනේ)
+        await conn.relayMessage(from, msg.message, { messageId: msg.key.id });
 
     } catch (e) {
         console.error("Error in alive command:", e);
