@@ -214,7 +214,7 @@ conn.ev.on('messages.update', async (chatUpdate) => {
              (type === 'buttonsResponseMessage') ? mek.message.buttonsResponseMessage.selectedButtonId : 
              (type === 'interactiveResponseMessage') ? JSON.parse(mek.message.interactiveResponseMessage.nativeFlowResponseMessage.paramsJson).id : '';
 
-  const isCmd = body.startsWith(prefix)
+  const isCmd = body.startsWith(config.PREFIX)
   var budy = typeof mek.text == 'string' ? mek.text : false;
   const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
   const args = body.trim().split(/ +/).slice(1)
