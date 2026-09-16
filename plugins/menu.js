@@ -72,9 +72,6 @@ cmd(
 ✦━━━━━━━━━━━━━━━━━━━━━
            🧑‍💻*DENETH-𝐌𝐃*🧑‍💻  
 ✦━━━━━━━━━━━━━━━━━━━━━
-
-> *POWERED BY DANUWA*
-
 `;
 
       // ==========================================
@@ -90,43 +87,36 @@ cmd(
         madeMenu += `╰─⊲⋅════════━━━━━┈⊷\n\n`;
       }
 
-      // ==========================================
-      // FOOTER
-      // ==========================================
-      madeMenu += `
-╭━━━〔 📢 𝐍𝐄𝐖𝐒𝐋𝐄𝐓𝐓𝐄𝐑 〕━━━╮
-┃
-┃        ✦ 𝐃𝐄𝐍𝐄𝐓𝐇 𝐌𝐃 ✦
-┃
-┃   🚀 *Stay Connected With Us*
-┃   💫 *Updates • Features • News*
-┃
-╰━━━━━━━━━━━━━━━━━━━━━
-
-        
-> ⚡*POWERED BY DENETH MD*⚡
-`;
+      madeMenu += `> ⚡*POWERED BY DENETH MD*⚡`;
 
       // ==========================================
-      // NEW 100% WORKING LIST BUTTONS SETUP
+      // 100% WORKING HYDRATED BUTTONS STRUCTURE
       // ==========================================
-      const sections = [
+      const templateButtons = [
         {
-          title: "📌 Main Options",
-          rows: [
-            { title: "📜 Main Menu", rowId: `${config.PREFIX}menu`, description: "Show bot command list" },
-            { title: "⚡ Alive Check", rowId: `${config.PREFIX}alive`, description: "Check if bot is online" },
-            { title: "🧑‍💻 Owner Info", rowId: `${config.PREFIX}owner`, description: "Get developer details" }
-          ]
+          index: 1,
+          urlButton: {
+            displayText: '🧑‍💻 Contact Owner',
+            url: `https://wa.me{config.OWNER_NUMBER}`
+          }
+        },
+        {
+          index: 2,
+          callButton: {
+            displayText: '📞 Call Owner',
+            phoneNumber: `${config.OWNER_NUMBER}`
+          }
         }
       ];
 
-      const listMessage = {
-        text: madeMenu,
+      // ==========================================
+      // SEND HYDRATED MESSAGE WITH IMAGE
+      // ==========================================
+      await robin.sendMessage(from, {
+        image: { url: "https://telegra.ph" },
+        caption: madeMenu,
         footer: "© POWERED BY DENETH MD",
-        title: "✨ *DENETH MD COMMAND MENU* ✨",
-        buttonText: "Click Here 🚀",
-        sections,
+        templateButtons: templateButtons,
         contextInfo: {
           mentionedJid: sender ? [sender] : [],
           forwardingScore: 1000,
@@ -137,13 +127,7 @@ cmd(
             serverMessageId: 143
           }
         }
-      };
-
-      // ලෝගෝ පින්තූරය මුලින් යැවීම
-      await robin.sendMessage(from, { image: { url: "https://telegra.ph" } }, { quoted: mek });
-
-      // ලිස්ට් බටන් මැසේජ් එක යැවීම
-      await robin.sendMessage(from, listMessage, { quoted: mek });
+      }, { quoted: mek });
 
     } catch (e) {
       console.error("MENU ERROR:", e);
