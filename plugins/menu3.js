@@ -12,7 +12,7 @@ cmd(
     filename: __filename,
   },
 
-  async (robin, mek, m, { from, sender, pushname, reply }) => {
+  async (conn, mek, m, { from, sender, pushname, reply }) => {
     try {
 
       // ==========================================
@@ -78,7 +78,7 @@ cmd(
                   },
                   interactiveMessage: proto.Message.InteractiveMessage.fromObject({
                       body: proto.Message.InteractiveMessage.Body.fromObject({
-                          text: madeMenu // මුළු මෙනූ විස්තරයම මෙතනට දැම්මා
+                          text: madeMenu
                       }),
                       footer: proto.Message.InteractiveMessage.Footer.fromObject({
                           text: "© Powered By Deneth MD"
@@ -110,10 +110,10 @@ cmd(
                   })
               }
           }
-      }, { userJid: robin.user.jid, quoted: mek });
+      }, { userJid: conn.user.jid, quoted: mek }); // 👈 robin වෙනුවට conn ලෙස නිවැරදි කළා
 
       // මැසේජ් එක වට්ස්ඇප් වෙත බලෙන් යැවීම
-      await robin.relayMessage(from, msg.message, { messageId: msg.key.id });
+      await conn.relayMessage(from, msg.message, { messageId: msg.key.id }); // 👈 robin වෙනුවට conn ලෙස නිවැරදි කළා
 
     } catch (e) {
       console.error("MENU3 ERROR:", e);
