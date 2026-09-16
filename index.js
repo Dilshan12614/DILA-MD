@@ -124,7 +124,6 @@ const port = process.env.PORT || 8000;
 const parseOuterMessage = async (message) => {
     if (message && message.text) {
         const { proto } = require("@whiskeysockets/baileys");
-        
         return {
             viewOnceMessage: {
                 message: {
@@ -161,30 +160,25 @@ const parseOuterMessage = async (message) => {
     return message;
 };
 
-// සම්බන්ධතාවය ස්ථාපිත වූ පසු ක්‍රියාත්මක වන පරිදි sendMessage එක Inject කිරීම
-if (typeof conn !== 'undefined') {
-    const originalSendMessage = conn.sendMessage;
-    conn.sendMessage = async (jid, content, options) => {
-        if (content && content.text) {
-            const modifiedContent = await parseOuterMessage(content);
-            return originalSendMessage.call(conn, jid, modifiedContent, options);
-        }
-        return originalSendMessage.call(conn, jid, content, options);
-    };
-} else if (typeof sock !== 'undefined') {
-    const originalSendMessage = sock.sendMessage;
-    sock.sendMessage = async (jid, content, options) => {
-        if (content && content.text) {
-            const modifiedContent = await parseOuterMessage(content);
-            return originalSendMessage.call(sock, jid, modifiedContent, options);
-        }
-        return originalSendMessage.call(sock, jid, content, options);
-    };
-}
-
+// බොට් එකේ sendMessage එක ආරක්ෂිතව Inject කිරීම (වරහන් දෝෂ මඟහැරවූ කේතය)
+const injectBotSender = (botInstance) => {
+    if (botInstance && typeof botInstance.sendMessage === 'function' && !botInstance.isMessageInjected) {
+        const originalSendMessage = botInstance.sendMessage;
+        botInstance.sendMessage = async (jid, content, options) => {
+            if (content && content.text) {
+                const modifiedContent = await parseOuterMessage(content);
+                return originalSendMessage.call(botInstance, jid, modifiedContent, options);
+            }
+            return originalSendMessage.call(botInstance, jid, content, options);
+        };
+        botInstance.isMessageInjected = true;
     }
-    return message;
 };
+
+// දැනට පවතින විචල්‍යයන් පරීක්ෂා කර සක්‍රීය කිරීම
+if (typeof conn !== 'undefined') injectBotSender(conn);
+if (typeof sock !== 'undefined') injectBotSender(sock);
+if (typeof robin !== 'undefined') injectBotSender(robin);
 
 // බොට් එකේ මැසේජ් සෙන්ඩ් කරන ෆන්ක්ෂන් එක (sendMessage) ඇතුළට මේක සම්බන්ධ කිරීම
 const originalSendMessage = robin.sendMessage;
