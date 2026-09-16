@@ -120,14 +120,31 @@ const port = process.env.PORT || 8000;
 
   //==============================
 
-  conn.ev.on('messages.update', async updates => {
-    for (const update of updates) {
-      if (update.update.message === null) {
-        console.log("Delete Detected:", JSON.stringify(update, null, 2));
-        await AntiDelete(conn, updates);
-      }
+  // ====== ANTI-DELETE FUNCTION ======
+conn.ev.on('messages.update', async (chatUpdate) => {
+    for (const key of chatUpdate) {
+        if (key.update.update === 'REVOKE') {
+            if (config.ANTI_DELETE === 'true') {
+                // මැකූ මැසේජ් එක මතකයෙන් ලබා ගැනීම
+                const deletedMessage = await conn.loadMessage(key.key.remoteJid, key.key.id);
+                if (!deletedMessage) return;
+
+                const from = key.key.remoteJid;
+                const participant = key.key.participant || key.key.remoteJid;
+                
+                let textMsg = `🍁 *ANTI-DELETE DETECTED* 🍁\n\n`;
+                textMsg += `👤 *User:* @${participant.split('@')[0]}\n`;
+                
+                // මැකූ මැසේජ් එක නැවත එවීමට අදාළ චැට් එක තෝරාගැනීම
+                const targetChat = config.ANTI_DEL_PATH === 'same' ? from : conn.user.id;
+
+                await conn.sendMessage(targetChat, { text: textMsg, mentions: [participant] }, { quoted: deletedMessage });
+                await conn.forwardMessage(targetChat, deletedMessage, false);
+            }
+        }
     }
-  });
+});
+
   //============================== 
           
   //=============readstatus=======
