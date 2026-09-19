@@ -189,7 +189,7 @@ const port = process.env.PORT || 8000;
                  }
              })() : '';
 
-const isCmd = body.startsWith(prefix);
+
 
   const isCmd = body.startsWith(prefix)
   var budy = typeof mek.text == 'string' ? mek.text : false;
