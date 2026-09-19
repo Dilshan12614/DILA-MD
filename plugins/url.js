@@ -1,68 +1,129 @@
-const { cmd } = require('../command');
+const { cmd, commands } = require('../command');
+const { downloadMediaMessage } = require('@whiskeysockets/baileys');
 const axios = require('axios');
+const fs = require('fs');
+const FormData = require('form-data');
 
-// Command to shorten any long URL
 cmd({
-    pattern: "short",
-    alias: ["url", "tinyurl"],
-    desc: "Shorten a long URL using TinyURL",
-    category: "converter",
-    react: "🔗",
+    pattern: "tourl",
+    alias: ["img2url", "url", "makeurl"],
+    desc: "Convert image to direct URL link with button",
+    category: "utility",
+    react: "🌐",
     filename: __filename
-}, async (conn, mek, m, { from, quoted, body, args, q, reply }) => {
+},
+async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply }) => {
     try {
-        if (!q) return reply("*Please provide a long URL!* \nExample: `.short https://example.com`");
-        
-        const response = await axios.get(`https://tinyurl.com{encodeURIComponent(q)}`);
-        if (response.data) {
-            return reply(`*🔗 Shortened URL:* \n${response.data}`);
-        } else {
-            return reply("*Failed to shorten the URL. Try again later!*");
-        }
-    } catch (e) {
-        console.error(e);
-        reply("*An error occurred while processing your request!*");
-    }
-});
+        // රිප්ලයි කරපු මැසේජ් එකක් හෝ කෙලින්ම එවපු මැසේජ් එකක්ද කියා බැලීම
+        const isQuotedImage = quoted && (quoted.type === 'imageMessage' || (quoted.msg && quoted.msg.mimetype && quoted.msg.mimetype.startsWith('image/')));
+        const isImage = m.type === 'imageMessage' || (m.msg && m.msg.mimetype && m.msg.mimetype.startsWith('image/'));
 
-// Command to get direct media/image URL if replying to an image/video
-cmd({
-    pattern: "imgurl",
-    alias: ["tourl", "mediaurl"],
-    desc: "Upload replied media to Catbox/Telegraph and get link",
-    category: "tools",
-    react: "📤",
-    filename: __filename
-}, async (conn, mek, m, { from, quoted, reply }) => {
-    try {
-        if (!quoted || !quoted.message) return reply("*Please reply to an image or video!*");
-        
-        // Check if quoted message has media
-        const mime = quoted.mtype || '';
-        if (!mime.includes('image') && !mime.includes('video') && !mime.includes('audio')) {
-            return reply("*Please reply to a valid image, video, or audio file!*");
+        if (!isImage && !isQuotedImage) {
+            return reply("❌ කරුණාකර ඡායාරූපයකට (Photo) Reply කරන්න හෝ ඡායාරූපයක් සමඟ `.tourl` කමාන්ඩ් එක භාවිතා කරන්න.");
         }
 
-        reply("*Uploading media to cloud...*");
-        const mediaBuffer = await quoted.download();
-        
-        // Using Catbox via FormData or simple upload API if available
-        const FormData = require('form-data');
+        // Processing මැසේජ් එකක් යැවීම
+        await reply("⏳ ඡායාරූපය ලින්ක් එකක් බවට පත් කරමින් පවතී, කරුණාකර රැඳී සිටින්න...");
+
+        // ඡායාරූපය ඩවුන්ලෝඩ් කරගැනීම
+        const messageToDownload = isQuotedImage ? quoted : m;
+        const buffer = await downloadMediaMessage(
+            messageToDownload,
+            'buffer',
+            {},
+            { 
+                logger: console,
+                reconnectIntervalMs: 5000
+            }
+        );
+
+        // තාවකාලිකව ෆයිල් එක සේව් කිරීම
+        const tempFilename = `./temp_${Date.now()}.jpg`;
+        fs.writeFileSync(tempFilename, buffer);
+
+        // Telegraph API එක වෙත ෆොටෝ එක Upload කිරීම
         const form = new FormData();
-        form.append('reqtype', 'fileupload');
-        form.append('fileToUpload', mediaBuffer, { filename: 'deneth_media.' + mime.split('/')[1] });
+        form.append('file', fs.createReadStream(tempFilename));
 
-        const uploadRes = await axios.post('https://catbox.moe', form, {
-            headers: { ...form.getHeaders() }
+        const response = await axios.post('https://telegra.ph', form, {
+            headers: form.getHeaders()
         });
 
-        if (uploadRes.data) {
-            return reply(`*🚀 Direct Media URL:* \n${uploadRes.data.trim()}`);
+        // තාවකාලික ෆයිල් එක ඩිලීට් කිරීම
+        fs.unlinkSync(tempFilename);
+
+        // ප්‍රතිඵලය පරිශීලකයා වෙත යැවීම
+        if (response.data && response.data[0] && response.data[0].src) {
+            const finalUrl = `https://telegra.ph${response.data[0].src}`;
+            
+            const successText = `✅ *IMAGE TO URL SUCCESS*\n\n👤 *Requested By:* ${pushname}\n🔗 *Direct Link:* ${finalUrl}`;
+
+            // =================================================================
+            // NATIVE FLOW CTA_URL BUTTON STRUCTURE (PATHUMTECH BAILEYS)
+            // =================================================================
+            const { generateWAMessageFromContent, proto, prepareWAMessageMedia } = require("@whiskeysockets/baileys");
+
+            // ලින්ක් එක ක්ලික් කරලා වෙබ් බ්‍රවුසර් එකෙන් ඕපන් කරගන්න බ්ටන් එක
+            const buttons = [
+                {
+                    "name": "cta_url",
+                    "buttonParamsJson": JSON.stringify({
+                        "display_text": "Open Image 🌐",
+                        "url": finalUrl,
+                        "merchant_url": finalUrl
+                    })
+                }
+            ];
+
+            // අපි අප්ලෝඩ් කරපු ෆොටෝ එකම ආපහු බ්ටන් එකේ උඩ Header එකට සෙට් කරනවා
+            const mediaMessage = await prepareWAMessageMedia({ image: { url: finalUrl } }, { upload: conn.waUploadToServer });
+
+            const msg = generateWAMessageFromContent(from, {
+                viewOnceMessage: {
+                    message: {
+                        messageContextInfo: {
+                            deviceListMetadata: {},
+                            deviceListMetadataVersion: 2
+                        },
+                        interactiveMessage: proto.Message.InteractiveMessage.fromObject({
+                            body: proto.Message.InteractiveMessage.Body.fromObject({
+                                text: successText
+                            }),
+                            footer: proto.Message.InteractiveMessage.Footer.fromObject({
+                                text: "© Powered By Deneth MD"
+                            }),
+                            header: proto.Message.InteractiveMessage.Header.fromObject({
+                                title: "✨ DENETH MD URL UPLOADER ✨",
+                                hasMediaAttachment: true,
+                                imageMessage: mediaMessage.imageMessage
+                            }),
+                            nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.fromObject({
+                                buttons: buttons
+                            }),
+                            contextInfo: {
+                                mentionedJid: [m.sender],
+                                forwardingScore: 999,
+                                isForwarded: true,
+                                forwardedNewsletterMessageInfo: {
+                                    newsletterJid: '120363429118791328@newsletter',
+                                    newsletterName: 'DENETH MD',
+                                    serverMessageId: 143
+                                }
+                            }
+                        })
+                    }
+                }
+            }, { userJid: conn.user.jid, quoted: mek });
+
+            // මැසේජ් එක වට්ස්ඇප් වෙත යැවීම
+            await conn.relayMessage(from, msg.message, { messageId: msg.key.id });
+
         } else {
-            return reply("*Upload failed!*");
+            reply("❌ ඡායාරූපය Upload කිරීමට නොහැකි විය. කරුණාකර නැවත උත්සාහ කරන්න.");
         }
+
     } catch (e) {
-        console.error(e);
-        reply(`*Error:* ${e.message}`);
+        console.error("Error in tourl command:", e);
+        reply(`❌ An error occurred: ${e.message}`);
     }
 });
