@@ -1,52 +1,70 @@
-const { cmd, commands } = require("../command");
-const config = require("../config");
+const { cmd } = require('../command');
+const { proto } = require('@whiskeysockets/baileys');
 
-cmd(
-  {
-    pattern: "menu3",
-    alias: ["listmenu"],
-    react: "📁",
-    desc: "Get beautiful list button menu",
+cmd({
+    pattern: "menu",
+    alias: ["help"],
     category: "main",
-    filename: __filename,
-  },
-
-  async (robin, mek, m, { from, sender, reply }) => {
+    desc: "Baileys Native Flow Button Base Command"
+}, async (conn, mek, msg, { jid, pushname }) => {
     try {
-      const { generateWAMessageFromContent, proto } = require("@whiskeysockets/baileys");
+        // 1. Baileys වලට ගැලපෙන ලෙස අලුත්ම බටන් මැසේජ් ව්‍යුහය (Button Structure) සෑදීම
+        const buttonMessage = {
+            viewOnceMessage: {
+                message: {
+                    interactiveMessage: proto.Message.InteractiveMessage.create({
+                        // ප්‍රධාන පණිවිඩය (Main Text Body)
+                        body: proto.Message.InteractiveMessage.Body.create({
+                            text: `👋 *Hello ${pushname}!*\n\nThis is a 100% working Button Base built using @whiskeysockets/baileys.`
+                        }),
+                        // පාදම (Footer Text)
+                        footer: proto.Message.InteractiveMessage.Footer.create({
+                            text: "🤖 QUEEN ELISA-MD Smart Base"
+                        }),
+                        // ශීර්ෂය (Header Title)
+                        header: proto.Message.InteractiveMessage.Header.create({
+                            title: "✨ QUEEN ELISA BUTTON SYSTEM ✨",
+                            hasMediaAttachment: false
+                        }),
+                        // නියම බොත්තම් (Native Flow Buttons) එකතු කරන කොටස
+                        nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
+                            buttons: [
+                                {
+                                    // 🔘 පළමු බොත්තම (Quick Reply Button)
+                                    "name": "quick_reply",
+                                    "buttonParamsJson": JSON.stringify({
+                                        "display_text": "📥 Download Menu",
+                                        "id": "sub_download_click" // ක්ලික් කලාම index.js එකට යන ID එක
+                                    })
+                                },
+                                {
+                                    // 🔘 දෙවන බොත්තම (Quick Reply Button)
+                                    "name": "quick_reply",
+                                    "buttonParamsJson": JSON.stringify({
+                                        "display_text": "ℹ️ About Bot",
+                                        "id": "about_bot_click"
+                                    })
+                                },
+                                {
+                                    // 🌐 වෙබ් අඩවි ලින්ක් විවෘත කරන බොත්තම (URL Button)
+                                    "name": "cta_url",
+                                    "buttonParamsJson": JSON.stringify({
+                                        "display_text": "🌐 Visit Website",
+                                        "url": "https://github.com",
+                                        "merchant_url": "https://github.com"
+                                    })
+                                }
+                            ],
+                        })
+                    })
+                }
+            }
+        };
 
-      // ස්ක්‍රීන්ෂොට් එකේ තිබුණු විදිහටම ලිස්ට් එකේ Options (තේරීම්) සකස් කිරීම
-      const sections = [
-        {
-          title: "🎬 Select Movie / Video Quality",
-          rows: [
-            { title: "1. 📁 Video (Document) • 720p", rowId: `${config.PREFIX}vid720`, description: "Download in SD quality" },
-            { title: "2. 📁 Video (Document) • 1080p", rowId: `${config.PREFIX}vid1080`, description: "Download in Full HD quality" },
-            { title: "3. 📁 Video (Document) • 2560p", rowId: `${config.PREFIX}vid2560`, description: "Download in Ultra HD 2K quality" }
-          ]
-        }
-      ];
+        // 2. සාමාන්‍用 sendMessage වෙනුවට relayMessage මඟින් බටන් එක WhatsApp සර්වර් එකට යැවීම
+        await conn.relayMessage(jid, buttonMessage, {});
 
-      // ලිස්ට් මැසේජ් එකේ ප්‍රධාන ව්‍යුහය
-      const listMessage = {
-        text: "Reply to this message with a number (1-3)\n🔄 You can select multiple options!", // ඔයාගේ ස්ක්‍රීන්ෂොට් එකේ තිබුණු ප්‍රධාන වැකිය
-        footer: "│ © Powered by LUXALGO ♡", // ඔයාගේ ස්ක්‍රීන්ෂොට් එකේ තිබුණු Footer එක
-        title: "✨ *DENETH MD VIDEO DOWNLOADER* ✨",
-        buttonText: "Select Quality 🚀", // බොත්තම මත දිස්වන වැකිය
-        sections: sections,
-        contextInfo: {
-          mentionedJid: sender ? [sender] : [],
-          forwardingScore: 1000,
-          isForwarded: true
-        }
-      };
-
-      // ලිස්ට් බටන් මැසේජ් එක වට්ස්ඇප් වෙත යැවීම
-      await robin.sendMessage(from, listMessage, { quoted: mek });
-
-    } catch (e) {
-      console.error("MENU3 ERROR:", e);
-      reply(`❌ Menu3 Error\n\n${e.message || e}`);
+    } catch (err) {
+        console.log("Error sending Baileys button message:", err);
     }
-  }
-);
+});
