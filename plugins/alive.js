@@ -17,7 +17,7 @@ async (conn, mek, m, { from, quoted, body, isCmd, command, args, q, isGroup, sen
         const hostname = os.hostname();
 
         // 🖼️ ඔයාගේ Image URL එක
-        const imageUrl = "https://github.com/Dilshan12614/DILA-MD/blob/main/IMG-20260910-WA0009.jpg"; 
+        const imageUrl = "IMG-20260910-WA0009.jpg"; 
 
         const status = `👋 *HELLO ${pushname} I AM ALIVE NOW*
 
