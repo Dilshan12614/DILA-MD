@@ -179,18 +179,17 @@ const port = process.env.PORT || 8000;
        (type === 'buttonsResponseMessage') ? mek.message.buttonsResponseMessage.selectedButtonId : 
        (type === 'listResponseMessage') ? mek.message.listResponseMessage.singleSelectReply.selectedRowId : 
        (type === 'templateButtonReplyMessage') ? mek.message.templateButtonReplyMessage.selectedId : 
-       // 👇 මේ පේළියෙන් තමයි Single Select / Open Menu එක ඇතුලේ තියෙන කමාන්ඩ්ස් නිවැරදිව කියව ගන්නේ
        (type === 'interactiveResponseMessage') ? (() => {
            try {
                const params = JSON.parse(mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '{}');
                return params.id || mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '';
            } catch {
-               // JSON Parse කරන්න බැරි වුණොත් කෙලින්ම එන string ID එක ලබා ගැනීම
                return mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '';
            }
        })() : '';
 
-isCmd = body.startsWith(prefix);
+// 🛠️ "let" කෑල්ල එකතු කරලා initialization error එක සම්පූර්ණයෙන්ම නැති කළා
+let isCmd = body.startsWith(prefix);
 
 
   const isCmd = body.startsWith(prefix)
