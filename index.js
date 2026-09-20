@@ -189,10 +189,8 @@ const port = process.env.PORT || 8000;
        })() : '';
 
 // 🛠️ "let" කෑල්ල එකතු කරලා initialization error එක සම්පූර්ණයෙන්ම නැති කළා
-let isCmd = body.startsWith(prefix);
 
-
-  const isCmd = body.startsWith(prefix)
+  let isCmd = body.startsWith(prefix); 
   var budy = typeof mek.text == 'string' ? mek.text : false;
   const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
   const args = body.trim().split(/ +/).slice(1)
