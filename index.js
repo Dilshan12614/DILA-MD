@@ -172,23 +172,25 @@ const port = process.env.PORT || 8000;
   const content = JSON.stringify(mek.message)
   const from = mek.key.remoteJid
   const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : []
-  const body = (type === 'conversation') ? mek.message.conversation : 
-             (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : 
-             (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : 
-             (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : 
-             // 👇 මේ පේළි ටිකෙන් තමයි හැම බ්ටන් සහ ලිස්ට් එකක්ම අඳුරගන්නේ
-             (type === 'buttonsResponseMessage') ? mek.message.buttonsResponseMessage.selectedButtonId : 
-             (type === 'listResponseMessage') ? mek.message.listResponseMessage.singleSelectReply.selectedRowId : 
-             (type === 'templateButtonReplyMessage') ? mek.message.templateButtonReplyMessage.selectedId : 
-             (type === 'interactiveResponseMessage') ? (() => {
-                 try {
-                     const params = JSON.parse(mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '{}');
-                     return params.id || '';
-                 } catch {
-                     return mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '';
-                 }
-             })() : '';
+  body = (type === 'conversation') ? mek.message.conversation : 
+       (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : 
+       (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : 
+       (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : 
+       (type === 'buttonsResponseMessage') ? mek.message.buttonsResponseMessage.selectedButtonId : 
+       (type === 'listResponseMessage') ? mek.message.listResponseMessage.singleSelectReply.selectedRowId : 
+       (type === 'templateButtonReplyMessage') ? mek.message.templateButtonReplyMessage.selectedId : 
+       // 👇 මේ පේළියෙන් තමයි Single Select / Open Menu එක ඇතුලේ තියෙන කමාන්ඩ්ස් නිවැරදිව කියව ගන්නේ
+       (type === 'interactiveResponseMessage') ? (() => {
+           try {
+               const params = JSON.parse(mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '{}');
+               return params.id || mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '';
+           } catch {
+               // JSON Parse කරන්න බැරි වුණොත් කෙලින්ම එන string ID එක ලබා ගැනීම
+               return mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '';
+           }
+       })() : '';
 
+isCmd = body.startsWith(prefix);
 
 
   const isCmd = body.startsWith(prefix)
