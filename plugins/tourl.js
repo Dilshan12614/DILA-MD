@@ -12,37 +12,27 @@ cmd({
 }, async (_0x2a615f, _0x296ebb, _0x131287, _0x46c0dd) => {
   const { from: _0x462e92, quoted: _0x38fbf1, reply: _0x74c833, sender: _0x5931e7 } = _0x46c0dd;
   try {
-    const type = Object.keys(_0x296ebb.message || {});
-    let _0x2fc0f4 = _0x296ebb.quoted ? _0x296ebb.quoted : _0x296ebb;
-    
-    // බටන් එකක් එබූ විට, ඊට අදාළ මුල් මැසේජ් එකේ (Context) ඇති පින්තූරය හඳුනාගැනීම
-    if (type === 'buttonsResponseMessage' || type === 'templateButtonReplyMessage') {
-      const contextInfo = _0x296ebb.message[type]?.contextInfo;
-      if (contextInfo?.quotedMessage && contextInfo.quotedMessage.imageMessage) {
-        _0x2fc0f4 = { msg: contextInfo.quotedMessage.imageMessage, download: () => _0x2a615f.downloadMediaMessage({ message: contextInfo.quotedMessage }) };
-      }
-    }
-
+    // බටන් පරික්ෂා කිරීම් ඉවත් කර සෘජුවම සාමාන්‍ය Quoted හෝ Direct මැසේජ් එක ලබා ගැනීම
+    const _0x2fc0f4 = _0x296ebb.quoted ? _0x296ebb.quoted : _0x296ebb;
     const _0x4dd0ec = (_0x2fc0f4.msg || _0x2fc0f4).mimetype || '';
+    
     console.log("Image mime type: ", _0x4dd0ec);
 
     if (!_0x4dd0ec || !_0x4dd0ec.startsWith("image")) {
       throw "🌻 Please reply to an image.";
     }
 
-    // 1. පින්තූරය Buffer එකක් ලෙස ඩවුන්ලෝඩ් කරගැනීම
+    // 1. පින්තූරය Buffer එකක් ලෙස බාගත කිරීම
     const _0x227cf8 = await _0x2fc0f4.download();
     
-    // 2. එය ImgBB සර්වර් එකට පහසුවෙන් කියවිය හැකි Base64 String එකක් බවට හැරවීම
+    // 2. එය ImgBB වෙත යැවීමට සුදුසු Base64 කේතයක් බවට හැරවීම
     const base64Image = _0x227cf8.toString('base64');
 
-    // 💡 මතක් කිරීම: ඔබ ://imgbb.com වෙතින් ගත් ඔබගේම API Key එකක් තිබේ නම්, එය පහත key= ස්ථානයට දමන්න.
+    // ඔබ ලබාදුන් නවතම සක්‍රීය API Key එක
     const apiKey = "039d17094c870b8147d2688d957c4b56"; 
-    
-    // 3. Invalid URL දෝෂය මඟහැරෙන පරිදි සාමාන්‍ය string එකක් ලෙස URL එක සකස් කිරීම
     const targetUrl = "https://api.imgbb.com/1/upload?key=" + apiKey;
     
-    // 4. Axios හරහා සාර්ථකව දත්ත යැවීම
+    // 3. Axios හරහා පින්තූර දත්ත ආරක්ෂිතව යැවීම
     const _0x338f64 = await axios({
       method: 'post',
       url: targetUrl,
@@ -53,7 +43,6 @@ cmd({
         'Content-Type': 'application/x-www-form-urlencoded'
       },
       transformRequest: [(data) => {
-        // දත්ත urlencoded format එකට හරවන සරලම ක්‍රමය
         return Object.keys(data).map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key])).join('&');
       }]
     });
