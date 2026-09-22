@@ -1,5 +1,5 @@
 const {
-  default: makeWASocket,
+    default: makeWASocket,
     useMultiFileAuthState,
     DisconnectReason,
     jidNormalizedUser,
@@ -19,206 +19,196 @@ const {
     jidDecode,
     fetchLatestBaileysVersion,
     Browsers
-  } = require('@whiskeysockets/baileys')
+} = require('@whiskeysockets/baileys')
   
+const l = console.log
+const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson } = require('./lib/functions')
+const { AntiDelDB, initializeAntiDeleteSettings, setAnti, getAnti, getAllAntiDeleteSettings, saveContact, loadMessage, getName, getChatSummary, saveGroupMetadata, getGroupMetadata, saveMessageCount, getInactiveGroupMembers, getGroupMembersMessageCount, saveMessage } = require('./data')
+const fs = require('fs')
+const ff = require('fluent-ffmpeg')
+const P = require('pino')
+const config = require('./config')
+const qrcode = require('qrcode-terminal')
+const StickersTypes = require('wa-sticker-formatter')
+const util = require('util')
+const { sms, downloadMediaMessage, AntiDelete } = require('./lib')
+const FileType = require('file-type');
+const axios = require('axios')
+const { File } = require('megajs')
+const { fromBuffer } = require('file-type')
+const bodyparser = require('body-parser')
+const os = require('os')
+const Crypto = require('crypto')
+const path = require('path')
+const prefix = config.PREFIX
   
-  const l = console.log
-  const { getBuffer, getGroupAdmins, getRandom, h2k, isUrl, Json, runtime, sleep, fetchJson } = require('./lib/functions')
-  const { AntiDelDB, initializeAntiDeleteSettings, setAnti, getAnti, getAllAntiDeleteSettings, saveContact, loadMessage, getName, getChatSummary, saveGroupMetadata, getGroupMetadata, saveMessageCount, getInactiveGroupMembers, getGroupMembersMessageCount, saveMessage } = require('./data')
-  const fs = require('fs')
-  const ff = require('fluent-ffmpeg')
-  const P = require('pino')
-  const config = require('./config')
-  const qrcode = require('qrcode-terminal')
-  const StickersTypes = require('wa-sticker-formatter')
-  const util = require('util')
-  const { sms, downloadMediaMessage, AntiDelete } = require('./lib')
-  const FileType = require('file-type');
-  const axios = require('axios')
-  const { File } = require('megajs')
-  const { fromBuffer } = require('file-type')
-  const bodyparser = require('body-parser')
-  const os = require('os')
-  const Crypto = require('crypto')
-  const path = require('path')
-  const prefix = config.PREFIX
+const ownerNumber = ['94740534738']
   
-  const ownerNumber = ['94740534738']
+const tempDir = path.join(os.tmpdir(), 'cache-temp')
+if (!fs.existsSync(tempDir)) {
+    fs.mkdirSync(tempDir)
+}
   
-  const tempDir = path.join(os.tmpdir(), 'cache-temp')
-  if (!fs.existsSync(tempDir)) {
-      fs.mkdirSync(tempDir)
-  }
+const clearTempDir = () => {
+    fs.readdir(tempDir, (err, files) => {
+        if (err) throw err;
+        for (const file of files) {
+            fs.unlink(path.join(tempDir, file), err => {
+                if (err) throw err;
+            });
+        }
+    });
+}
   
-  const clearTempDir = () => {
-      fs.readdir(tempDir, (err, files) => {
-          if (err) throw err;
-          for (const file of files) {
-              fs.unlink(path.join(tempDir, file), err => {
-                  if (err) throw err;
-              });
-          }
-      });
-  }
+// Clear the temp directory every 5 minutes
+setInterval(clearTempDir, 5 * 60 * 1000);
   
-  // Clear the temp directory every 5 minutes
-  setInterval(clearTempDir, 5 * 60 * 1000);
-  
-  //===================SESSION-AUTH============================
+//===================SESSION-AUTH============================
 if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
-if(!config.SESSION_ID) return console.log('Please add your session to SESSION_ID env !!')
-const sessdata = config.SESSION_ID.replace("LUXALGO=", '');
-const filer = File.fromURL(`https://mega.nz/file/${sessdata}`)
-filer.download((err, data) => {
-if(err) throw err
-fs.writeFile(__dirname + '/sessions/creds.json', data, () => {
-console.log("Session downloaded ✅")
-})})}
+    if(!config.SESSION_ID) return console.log('Please add your session to SESSION_ID env !!')
+    const sessdata = config.SESSION_ID.replace("LUXALGO=", '');
+    const filer = File.fromURL(`https://mega.nz{sessdata}`)
+    filer.download((err, data) => {
+        if(err) throw err
+        fs.writeFile(__dirname + '/sessions/creds.json', data, () => {
+            console.log("Session downloaded ✅")
+        })
+    })
+}
 
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 8000;
   
-  //=============================================
+//=============================================
   
-  async function connectToWA() {
-  console.log("Connecting to WhatsApp ⏳️...");
-  const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions/')
-  var { version } = await fetchLatestBaileysVersion()
+async function connectToWA() {
+    console.log("Connecting to WhatsApp ⏳️...");
+    const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions/')
+    var { version } = await fetchLatestBaileysVersion()
   
-  const conn = makeWASocket({
-          logger: P({ level: 'silent' }),
-          printQRInTerminal: false,
-          browser: Browsers.macOS("Firefox"),
-          syncFullHistory: true,
-          auth: state,
-          version
-          })
+    const conn = makeWASocket({
+        logger: P({ level: 'silent' }),
+        printQRInTerminal: false,
+        browser: Browsers.macOS("Firefox"),
+        syncFullHistory: true,
+        auth: state,
+        version
+    })
       
-  conn.ev.on('connection.update', (update) => {
-  const { connection, lastDisconnect } = update
-  if (connection === 'close') {
-  if (lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut) {
-  connectToWA()
-  }
-  } else if (connection === 'open') {
-  console.log('🧬 Installing Plugins')
-  const path = require('path');
-  fs.readdirSync("./plugins/").forEach((plugin) => {
-  if (path.extname(plugin).toLowerCase() == ".js") {
-  require("./plugins/" + plugin);
-  }
-  });
-  console.log('Plugins installed successful ✅')
-  console.log('Bot connected to whatsapp ✅')
-  
-  let up = `*Hello There DARK-SHADOW-MD User! \ud83d\udc4b\ud83c\udffb* \n\n> Simple , Straight Forward But Loaded With Features \ud83c\udf8a, Meet DARK-SHADOW MD WhatsApp Bot.\n\n *Thanks for using DARK-SHADOW-MD \ud83d\udea9* \n\n> Join WhatsApp Channel :- ⤵️\n \nhttps://whatsapp.com/channel/0029Vb7bwXEEAKWNJgBICJ0w\n\n- *YOUR PREFIX:* = ${prefix}\n\nDont forget to give star to repo ⬇️\n\nhttps://github.com/DARK-SHADOW-NEW/DARK-SHADOW-V3\n\n> © Powered BY DARK-SHADOW \ud83d\udda4`;
-    conn.sendMessage(conn.user.id, { image: { url: `https://telegra.ph/file/1ece2e0281513c05d20ee.jpg` }, caption: up })
-  }
-  })
-  conn.ev.on('creds.update', saveCreds)
-
-  //==============================
-
-  conn.ev.on('messages.update', async updates => {
-    for (const update of updates) {
-      if (update.update.message === null) {
-        console.log("Delete Detected:", JSON.stringify(update, null, 2));
-        await AntiDelete(conn, updates);
-      }
-    }
-  });
-  //============================== 
-          
-  //=============readstatus=======
-        
-  conn.ev.on('messages.upsert', async(mek) => {
-    mek = mek.messages[0]
-    if (!mek.message) return
-    mek.message = (getContentType(mek.message) === 'ephemeralMessage') 
-    ? mek.message.ephemeralMessage.message 
-    : mek.message;
-    //console.log("New Message Detected:", JSON.stringify(mek, null, 2));
-  if (config.READ_MESSAGE === 'true') {
-    await conn.readMessages([mek.key]);  // Mark message as read
-    console.log(`Marked message from ${mek.key.remoteJid} as read.`);
-  }
-    if(mek.message.viewOnceMessageV2)
-    mek.message = (getContentType(mek.message) === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
-    if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_SEEN === "true"){
-      await conn.readMessages([mek.key])
-    }
-  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true"){
-    const jawadlike = await conn.decodeJid(conn.user.id);
-    const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
-    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    await conn.sendMessage(mek.key.remoteJid, {
-      react: {
-        text: randomEmoji,
-        key: mek.key,
-      } 
-    }, { statusJidList: [mek.key.participant, jawadlike] });
-  }                       
-  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true"){
-  const user = mek.key.participant
-  const text = `${config.AUTO_STATUS_MSG}`
-  await conn.sendMessage(user, { text: text, react: { text: '💜', key: mek.key } }, { quoted: mek })
+    conn.ev.on('connection.update', (update) => {
+        const { connection, lastDisconnect } = update
+        if (connection === 'close') {
+            if (lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut) {
+                connectToWA()
             }
-            await Promise.all([
-              saveMessage(mek),
-            ]);
-  const m = sms(conn, mek)
-  const type = getContentType(mek.message)
-  const content = JSON.stringify(mek.message)
-  const from = mek.key.remoteJid
-  const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : []
-    body = (type === 'conversation') ? mek.message.conversation : 
-       (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : 
-       (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : 
-       (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : 
-       (type === 'buttonsResponseMessage') ? mek.message.buttonsResponseMessage.selectedButtonId : 
-       (type === 'listResponseMessage') ? mek.message.listResponseMessage.singleSelectReply.selectedRowId : 
-       (type === 'templateButtonReplyMessage') ? mek.message.templateButtonReplyMessage.selectedId : 
-       // 📋 ලිස්ට්/බටන් මෙනු එකෙන් එන ID එක නිවැරදිව කියවා ගැනීම
-       (type === 'interactiveResponseMessage') ? (() => {
-           try {
-               const params = JSON.parse(mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '{}');
-               return params.id || mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '';
-           } catch {
-               return mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '';
-           }
-       })() : '';
+        } else if (connection === 'open') {
+            console.log('🧬 Installing Plugins')
+            const path = require('path');
+            fs.readdirSync("./plugins/").forEach((plugin) => {
+                if (path.extname(plugin).toLowerCase() == ".js") {
+                    require("./plugins/" + plugin);
+                }
+            });
+            console.log('Plugins installed successful ✅')
+            console.log('Bot connected to whatsapp ✅')
+            
+            let up = `*Hello There DARK-SHADOW-MD User! \ud83d\udc4b\ud83c\udffb* \n\n> Simple , Straight Forward But Loaded With Features \ud83c\udf8a, Meet DARK-SHADOW MD WhatsApp Bot.\n\n *Thanks for using DARK-SHADOW-MD \ud83d\udea9* \n\n> Join WhatsApp Channel :- ⤵️\n \nhttps://whatsapp.com\n\n- *YOUR PREFIX:* = ${prefix}\n\nDont forget to give star to repo ⬇️\n\nhttps://github.com\n\n> © Powered BY DARK-SHADOW \ud83d\udda4`;
+            conn.sendMessage(conn.user.id, { image: { url: `https://telegra.ph` }, caption: up })
+        }
+    })
+    conn.ev.on('creds.update', saveCreds)
 
-  // 1. ලිස්ට් හෝ බටන් එකක් එබුවහොත් එය බලෙන්ම Command එකක් (isCmd = true) ලෙස හඳුනාගැනීම
-  const isCmd = body.startsWith(prefix) || type === 'interactiveResponseMessage';
-  
-  // 2. කමාන්ඩ් එකේ නම (Command Name) නිවැරදිව වෙන් කරගැනීම (Crash වීම් වළක්වයි)
-  let command;
-  if (type === 'interactiveResponseMessage') {
-      let cleanBody = body.startsWith(prefix) ? body.slice(prefix.length) : body;
-      command = cleanBody.trim().split(' ').shift().toLowerCase();
-  } else {
-      command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : '';
-  }
+    //==============================
+    conn.ev.on('messages.update', async updates => {
+        for (const update of updates) {
+            if (update.update.message === null) {
+                console.log("Delete Detected:", JSON.stringify(update, null, 2));
+                await AntiDelete(conn, updates);
+            }
+        }
+    });
+    //============================== 
+          
+    //=============readstatus=======
+    conn.ev.on('messages.upsert', async(mek) => {
+        mek = mek.messages[0] // 🛠️ මෙතැන [0] නිවැරදිව ඇතුළත් කර ඇත
+        if (!mek.message) return
+        mek.message = (getContentType(mek.message) === 'ephemeralMessage') 
+            ? mek.message.ephemeralMessage.message 
+            : mek.message;
 
-  // 3. Arguments (args) සහ q විචල්‍යයන් ආරක්ෂිතව සකස් කිරීම
-  const args = body && typeof body === 'string' ? body.trim().split(/ +/).slice(1) : [];
-  const q = args.join(' ');
+        if (config.READ_MESSAGE === 'true') {
+            await conn.readMessages([mek.key]);  
+            console.log(`Marked message from ${mek.key.remoteJid} as read.`);
+        }
+        if(mek.message.viewOnceMessageV2)
+            mek.message = (getContentType(mek.message) === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
+        if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_SEEN === "true"){
+            await conn.readMessages([mek.key])
+        }
+        if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true"){
+            const jawadlike = await conn.decodeJid(conn.user.id);
+            const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
+            const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+            await conn.sendMessage(mek.key.remoteJid, {
+                react: { text: randomEmoji, key: mek.key } 
+            }, { statusJidList: [mek.key.participant, jawadlike] });
+        }                       
+        if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true"){
+            const user = mek.key.participant
+            const text = `${config.AUTO_STATUS_MSG}`
+            await conn.sendMessage(user, { text: text, react: { text: '💜', key: mek.key } }, { quoted: mek })
+        }
+        await Promise.all([
+            saveMessage(mek),
+        ]);
 
-  // =================================================================
-  // 🚀 COMMAND EXECUTION SYSTEM (කමාන්ඩ් එක ක්‍රියාත්මක කරවන කොටස)
-  // =================================================================
-  const cmd = commands.find((c) => c.pattern === command) || commands.find((c) => c.alias && c.alias.includes(command));
-  
-  if (cmd) {
-      // 👥 Group Metadata ආරක්ෂිතව කියවීම (Undefined Error එක මඟහැරීමට Optional Chaining යොදා ඇත)
-      const groupMetadata = from.endsWith('@g.us') ? await conn.groupMetadata(from).catch(() => null) : null;
-      const groupName = groupMetadata ? groupMetadata.subject : '';
-      const participants = groupMetadata ? groupMetadata.participants : [];
-      const groupAdmins = groupMetadata ? getGroupAdmins(participants) : [];
-      
-      const isGroup = from.endsWith('@g.us');
-      const sender = isGroup ? mek.key.participant : from;
+        const m = sms(conn, mek)
+        const type = getContentType(mek.message)
+        const content = JSON.stringify(mek.message)
+        const from = mek.key.remoteJid
+        const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : []
+        
+        body = (type === 'conversation') ? mek.message.conversation : 
+               (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : 
+               (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : 
+               (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : 
+               (type === 'buttonsResponseMessage') ? mek.message.buttonsResponseMessage.selectedButtonId : 
+               (type === 'listResponseMessage') ? mek.message.listResponseMessage.singleSelectReply.selectedRowId : 
+               (type === 'templateButtonReplyMessage') ? mek.message.templateButtonReplyMessage.selectedId : 
+               (type === 'interactiveResponseMessage') ? (() => {
+                   try {
+                       const params = JSON.parse(mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '{}');
+                       return params.id || mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '';
+                   } catch {
+                       return mek.message.interactiveResponseMessage.nativeFlowRenderTargetTemplateNavChallengeMessage?.paramsJson || '';
+                   }
+               })() : '';
+
+        const isCmd = body.startsWith(prefix) || type === 'interactiveResponseMessage';
+        
+        let command;
+        if (type === 'interactiveResponseMessage') {
+            let cleanBody = body.startsWith(prefix) ? body.slice(prefix.length) : body;
+            command = cleanBody.trim().split(' ').shift().toLowerCase();
+        } else {
+            command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : '';
+        }
+
+        const args = body && typeof body === 'string' ? body.trim().split(/ +/).slice(1) : [];
+        const q = args.join(' ');
+
+        const cmd = commands.find((c) => c.pattern === command) || commands.find((c) => c.alias && c.alias.includes(command));
+        
+        if (cmd) {
+            const groupMetadata = from.endsWith('@g.us') ? await conn.groupMetadata(from).catch(() => null) : null;
+            const groupName = groupMetadata ? groupMetadata.subject : '';
+            const participants = groupMetadata ? groupMetadata.participants : [];
+            const groupAdmins = groupMetadata ? getGroupAdmins(participants) : [];
+            
+            const isGroup = from.endsWith('@g.us');
+            const sender = isGroup ? mek.key.participant : from;
       const senderNumber = sender.split('@')[0];
       const botNumber = conn.user.id.split(':')[0] + '@s.whatsapp.net';
       const botNumber2 = conn.user.id;
@@ -241,6 +231,3 @@ const port = process.env.PORT || 8000;
 } // connectToWA ශ්‍රිතය අවසන් කිරීම
 
 connectToWA().catch(err => console.log("Main Connection Error:", err));
-
-
-                                
