@@ -1,5 +1,5 @@
 const { downloadMediaMessage } = require('@whiskeysockets/baileys');
-const { uploadToImgbb } = require('../../lib/functions');
+const { uploadToImgbb } = require('../lib/functions');
 
 module.exports = {
     command: 'tourl',
