@@ -192,7 +192,14 @@ const port = process.env.PORT || 8000;
 
   let isCmd = body.startsWith(prefix); 
   var budy = typeof mek.text == 'string' ? mek.text : false;
-  const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
+  // 📋 සාමාන්‍ය මැසේජ් සහ ලිස්ට්/බ්ටන් මැසේජ් දෙකේම කමාන්ඩ් නම නිවැරදිව වෙන් කරගැනීම
+let command;
+if (type === 'interactiveResponseMessage') {
+    command = body.startsWith(prefix) ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : body.trim().split(' ').shift().toLowerCase();
+} else {
+    command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : '';
+}
+
   const args = body.trim().split(/ +/).slice(1)
   const q = args.join(' ')
   const text = args.join(' ')
