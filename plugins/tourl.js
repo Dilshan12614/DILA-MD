@@ -42,7 +42,7 @@ cmd({
     _0x1bf672.append("image", fs.createReadStream(_0x18c2b8), { filename: 'deneth_upload.png' });
 
     // 💡 උපදෙස: මෙම කේතය වැඩ නොකරන්නේ නම්, කරුණාකර api.imgbb.com වෙතින් ලබාගන්නා ඔබේම API Key එකක් පහත key= තැනට දමන්න.
-    const _0x338f64 = await axios.post("https://imgbb.com", _0x1bf672, {
+    const _0x338f64 = await axios.post("https://api.imgbb.com/1/upload", _0x1bf672, {
       'headers': {
         ..._0x1bf672.getHeaders()
       }
