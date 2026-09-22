@@ -78,14 +78,28 @@ cmd({
     };
 
     // සාර්ථක ප්‍රතිඵලය DENETH-MD නමින් පරිශීලකයා වෙත යැවීම
+        // සාර්ථක ප්‍රතිඵලය බටන් එකක් (URL Button) සමඟ DENETH-MD නමින් යැවීම
     await _0x2a615f.sendMessage(_0x462e92, {
-      'image': { url: "https://ibb.co" },
-      'caption': `*Image Uploaded Successfully 📸*\nSize: ${_0x227cf8.length} Byte(s)\n*URL:* ${_0x2b12b1}\n\n> ⚖️ Uploaded via 𝐃𝐄𝐍𝐄𝐓𝐇-𝐌𝐃`,
-      'contextInfo': _0x273817
+      'text': `*Image Uploaded Successfully 📸*\nSize: ${_0x227cf8.length} Byte(s)\n\n> ⚖️ Uploaded via 𝐃𝐄𝐍𝐄𝐓𝐇-𝐌𝐃`,
+      'contextInfo': _0x273817,
+      'buttons': [
+        {
+          'buttonId': 'action',
+          'buttonText': { 'displayText': '🌐 View Image URL' },
+          'type': 4,
+          'nativeFlowInfo': {
+            'buttons': [
+              {
+                'name': 'cta_url',
+                'buttonParamsJson': JSON.stringify({
+                  'display_text': '🌐 View Image',
+                  'url': _0x2b12b1,
+                  'merchant_url': _0x2b12b1
+                })
+              }
+            ]
+          }
+        }
+      ],
+      'viewOnce': true
     });
-
-  } catch (_0x5db687) {
-    _0x74c833("Error: " + _0x5db687);
-    console.error("Error occurred:", _0x5db687);
-  }
-});
