@@ -12,8 +12,19 @@ cmd({
 }, async (_0x2a615f, _0x296ebb, _0x131287, _0x46c0dd) => {
   const { from: _0x462e92, quoted: _0x38fbf1, reply: _0x74c833, sender: _0x5931e7 } = _0x46c0dd;
   try {
-    // බටන් පරික්ෂා කිරීම් ඉවත් කර සෘජුවම සාමාන්‍ය Quoted හෝ Direct මැසේජ් එක ලබා ගැනීම
-    const _0x2fc0f4 = _0x296ebb.quoted ? _0x296ebb.quoted : _0x296ebb;
+    // ---- බටන් වලින් එන මැසේජ් සහ සාමාන්‍ය මැසේජ් දෙකම හඳුනාගැනීමේ කොටස ----
+    const type = Object.keys(_0x296ebb.message || {});
+    let _0x2fc0f4 = _0x296ebb.quoted ? _0x296ebb.quoted : _0x296ebb;
+    
+    // බටන් එකක් එබූ විට, ඊට අදාළ මුල් මැසේජ් එකේ (Context) ඇති පින්තූරය හඳුනාගැනීම
+    if (type === 'buttonsResponseMessage' || type === 'templateButtonReplyMessage') {
+      const contextInfo = _0x296ebb.message[type]?.contextInfo;
+      if (contextInfo?.quotedMessage && contextInfo.quotedMessage.imageMessage) {
+        _0x2fc0f4 = { msg: contextInfo.quotedMessage.imageMessage, download: () => _0x2a615f.downloadMediaMessage({ message: contextInfo.quotedMessage }) };
+      }
+    }
+    // ----------------------------------------------------------------
+
     const _0x4dd0ec = (_0x2fc0f4.msg || _0x2fc0f4).mimetype || '';
     
     console.log("Image mime type: ", _0x4dd0ec);
