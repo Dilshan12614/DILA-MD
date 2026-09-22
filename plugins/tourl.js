@@ -38,7 +38,7 @@ cmd({
 
     // ඔබ ලබාදුන් සක්‍රීය API Key එක
     const apiKey = "039d17094c870b8147d2688d957c4b56"; 
-    const targetUrl = "https://imgbb.com" + apiKey;
+    const targetUrl = "https://api.imgbb.com/1/upload?key=" + apiKey;
     
     // 3. ImgBB වෙත පින්තූරය යැවීම
     const _0x338f64 = await axios({
