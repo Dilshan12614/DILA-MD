@@ -65,9 +65,15 @@ setInterval(clearTempDir, 5 * 60 * 1000);
   
 //===================SESSION-AUTH============================
 if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
+//===================SESSION-AUTH============================
+if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
     if(!config.SESSION_ID) return console.log('Please add your session to SESSION_ID env !!')
     const sessdata = config.SESSION_ID.replace("LUXALGO=", '');
-    const filer = File.fromURL(`https://mega.nz{sessdata}`)
+    
+    // ලින්ක් එක නිවැරදිව mega.nz hostname එකට සකස් කිරීම
+    const megaUrl = sessdata.startsWith('https://') ? sessdata : `https://mega.nz/file/${sessdata}`;
+    const filer = File.fromURL(megaUrl)
+    
     filer.download((err, data) => {
         if(err) throw err
         fs.writeFile(__dirname + '/sessions/creds.json', data, () => {
@@ -75,6 +81,7 @@ if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
         })
     })
 }
+
 
 const express = require("express");
 const app = express();
