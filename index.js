@@ -200,8 +200,8 @@ if (type === 'interactiveResponseMessage') {
     command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : '';
 }
 
-  const args = body.trim().split(/ +/).slice(1)
-  const q = args.join(' ')
+  const args = body && typeof body === 'string' ? body.trim().split(/ +/).slice(1) : [];
+  const q = args.join(' ');
   const text = args.join(' ')
   const isGroup = from.endsWith('@g.us')
   const sender = mek.key.fromMe ? (conn.user.id.split(':')[0]+'@s.whatsapp.net' || conn.user.id) : (mek.key.participant || mek.key.remoteJid)
