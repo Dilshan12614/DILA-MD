@@ -58,15 +58,15 @@ cmd({
       'isForwarded': true,
       'forwardedNewsletterMessageInfo': {
         'newsletterJid': '120363292876277898@newsletter',
-        'newsletterName': "𝐃𝐄𝐍𝐄𝐓𝐇-𝐌𝐃",
+        'newsletterName': "DENETH-𝐌𝐃",
         'serverMessageId': 0x8f
       }
     };
 
-    // 4. 💡 ඔබ ලබාදුන් DENETH-MD ස්ථිර ලෝගෝ පින්තූරය සමඟ ප්‍රතිඵලය සෙන්ඩ් කිරීම
+    // 4. 💡 මෙන්න මේ 94 වන පේළියේ 'url': වෙනුවට ඔබේ ස්ථිර ලෝගෝ ලින්ක් එක ඇතුළත් කළා!
     await _0x2a615f.sendMessage(_0x462e92, {
-      'image': { url: "https://ibb.co" },
-      'caption': `*Image Uploaded Successfully 📸*\n\n*Size:* ${_0x227cf8.length} Byte(s)\n*URL:* ${_0x2b12b1}\n\n> 🏻 Uploaded via 𝐃𝐄𝐍𝐄𝐓𝐇-𝐌𝐃`,
+      'image': { url: "https://i.ibb.co/0pk0Lrb1/6a6496529e1b.jpg" },
+      'caption': `*Image Uploaded Successfully 📸*\n\n*Size:* ${_0x227cf8.length} Byte(s)\n*URL:* ${_0x2b12b1}\n\n> 🏻 Uploaded via DENETH-𝐌𝐃`,
       'contextInfo': _0x273817
     }, { quoted: _0x296ebb });
 
