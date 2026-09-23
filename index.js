@@ -67,7 +67,7 @@ const {
   //===================SESSION-AUTH============================
 if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
 if(!config.SESSION_ID) return console.log('Please add your session to SESSION_ID env !!')
-const sessdata = config.SESSION_ID;
+const sessdata = config.SESSION_ID.replace("LUXALGO=", '');
 const filer = File.fromURL(`https://mega.nz/file/${sessdata}`)
 filer.download((err, data) => {
 if(err) throw err
@@ -172,15 +172,8 @@ const port = process.env.PORT || 8000;
   const content = JSON.stringify(mek.message)
   const from = mek.key.remoteJid
   const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : []
-  const body = (type === 'conversation') ? mek.message.conversation : 
-             (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : 
-             (type === 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : 
-             (type === 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : 
-             (type === 'buttonsResponseMessage') ? mek.message.buttonsResponseMessage.selectedButtonId : 
-             (type === 'templateButtonReplyMessage') ? mek.message.templateButtonReplyMessage.selectedId : '';
-
-const isCmd = body.startsWith(prefix);
-
+  const body = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : ''
+  const isCmd = body.startsWith(prefix)
   var budy = typeof mek.text == 'string' ? mek.text : false;
   const command = isCmd ? body.slice(prefix.length).trim().split(' ').shift().toLowerCase() : ''
   const args = body.trim().split(/ +/).slice(1)
@@ -205,7 +198,7 @@ const isCmd = body.startsWith(prefix);
   conn.sendMessage(from, { text: teks }, { quoted: mek })
   }
   const udp = botNumber.split('@')[0];
-    const jawad = ('94740534738', '94761068032', '94723975388');
+    const jawad = ('94773416478', '94761068032', '94723975388');
     let isCreator = [udp, jawad, config.DEV]
 					.map(v => v.replace(/[^0-9]/g) + '@s.whatsapp.net')
 					.includes(mek.sender);
