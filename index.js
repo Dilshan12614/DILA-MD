@@ -66,14 +66,52 @@ const {
   
   //===================SESSION-AUTH============================
 if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
-if(!config.SESSION_ID) return console.log('Please add your session to SESSION_ID env !!')
-const sessdata = config.SESSION_ID.replace("THENUVA-XMD=", '');
-const filer = File.fromURL(`https://mega.nz/file/${sessdata}`)
-filer.download((err, data) => {
-if(err) throw err
-fs.writeFile(__dirname + '/sessions/creds.json', data, () => {
-console.log("Session downloaded ✅")
-})})}
+
+    if (!config.SESSION_ID) {
+        return console.log('Please add your session to SESSION_ID env !!');
+    }
+
+    // Remove THENUVA-XMD= prefix
+    const sessdata = config.SESSION_ID.replace(/^THENUVA-XMD=/, '').trim();
+
+    // SESSION_ID must contain the complete MEGA URL
+    // Example:
+    // https://mega.nz/file/lIdglLgS#4-YSkzpGLDLEzO63JqnmLeThvHlmaXOH9LFTZUktU0Y
+
+    if (!sessdata.startsWith('https://mega.nz/file/')) {
+        return console.log('❌ Invalid SESSION_ID: Complete MEGA file URL is required.');
+    }
+
+    if (!sessdata.includes('#')) {
+        return console.log('❌ Invalid SESSION_ID: MEGA file key is missing (#key).');
+    }
+
+    console.log('📥 Downloading session from MEGA...');
+
+    const filer = File.fromURL(sessdata);
+
+    filer.download((err, data) => {
+        if (err) {
+            console.error('❌ Session download failed:', err);
+            return;
+        }
+
+        fs.writeFile(
+            __dirname + '/sessions/creds.json',
+            data,
+            (writeErr) => {
+                if (writeErr) {
+                    console.error('❌ Failed to save session:', writeErr);
+                    return;
+                }
+
+                console.log('✅ Session downloaded successfully!');
+            }
+        );
+    });
+}
+
+//=============================================
 
 const express = require("express");
 const app = express();
