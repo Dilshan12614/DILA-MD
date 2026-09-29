@@ -43,7 +43,7 @@ const {
   const path = require('path')
   const prefix = config.PREFIX
   
-  const ownerNumber = ['94740534738']
+  const ownerNumber = ['94783747285']
   
   const tempDir = path.join(os.tmpdir(), 'cache-temp')
   if (!fs.existsSync(tempDir)) {
@@ -111,8 +111,6 @@ if (!fs.existsSync(__dirname + '/sessions/creds.json')) {
     });
 }
 
-//=============================================
-
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 8000;
@@ -120,290 +118,41 @@ const port = process.env.PORT || 8000;
   //=============================================
   
   async function connectToWA() {
-    try {
-        console.log("╭──────────────────────────────╮");
-        console.log("│   🚀 THENUVA-XMD STARTING     │");
-        console.log("╰──────────────────────────────╯");
-
-        const sessionPath = __dirname + "/sessions/";
-
-        // Make sure sessions folder exists
-        if (!fs.existsSync(sessionPath)) {
-            fs.mkdirSync(sessionPath, { recursive: true });
-        }
-
-        console.log("📂 Session path:", sessionPath);
-
-        const { state, saveCreds } =
-            await useMultiFileAuthState(sessionPath);
-
-        const { version } = await fetchLatestBaileysVersion();
-
-        console.log("📡 Connecting to WhatsApp...");
-        console.log("📦 Baileys version:", version.join("."));
-
-        const conn = makeWASocket({
-            logger: P({ level: "silent" }),
-
-            printQRInTerminal: false,
-
-            browser: Browsers.macOS("Firefox"),
-
-            auth: state,
-
-            version,
-
-            syncFullHistory: false,
-
-            markOnlineOnConnect: false,
-
-            generateHighQualityLinkPreview: false,
-
-            connectTimeoutMs: 60000,
-
-            defaultQueryTimeoutMs: 60000,
-
-            keepAliveIntervalMs: 30000
-        });
-
-        // Save credentials whenever they change
-        conn.ev.on("creds.update", saveCreds);
-
-        conn.ev.on("connection.update", async (update) => {
-            const {
-                connection,
-                lastDisconnect
-            } = update;
-
-            console.log("🔄 Connection update:", connection);
-
-            // =========================
-            // CONNECTED
-            // =========================
-            if (connection === "open") {
-
-                console.log("");
-                console.log("╭──────────────────────────────╮");
-                console.log("│     ✅ WHATSAPP CONNECTED     │");
-                console.log("╰──────────────────────────────╯");
-
-                try {
-                    // Install plugins only once
-                    console.log("🧩 Installing plugins...");
-
-                    const path = require("path");
-
-                    const pluginDir = path.join(
-                        __dirname,
-                        "plugins"
-                    );
-
-                    if (fs.existsSync(pluginDir)) {
-
-                        const plugins = fs
-                            .readdirSync(pluginDir)
-                            .filter(
-                                (plugin) =>
-                                    path
-                                        .extname(plugin)
-                                        .toLowerCase() === ".js"
-                            );
-
-                        for (const plugin of plugins) {
-                            try {
-                                require(
-                                    path.join(
-                                        pluginDir,
-                                        plugin
-                                    )
-                                );
-
-                                console.log(
-                                    "✅ Plugin loaded:",
-                                    plugin
-                                );
-
-                            } catch (pluginError) {
-
-                                console.error(
-                                    "❌ Plugin failed:",
-                                    plugin
-                                );
-
-                                console.error(
-                                    pluginError.message
-                                );
-                            }
-                        }
-                    }
-
-                    console.log("✅ Plugins installed");
-                    console.log("🤖 THENUVA-XMD is ONLINE");
-
-                    // =========================
-                    // CONNECTED MESSAGE
-                    // =========================
-
-                    const botJid = conn.user?.id;
-
-                    if (botJid) {
-
-                        const pushName =
-                            conn.user?.name ||
-                            conn.user?.verifiedName ||
-                            "WhatsApp User";
-
-                        const phoneNumber =
-                            botJid.split(":")[0].split("@")[0];
-
-                        const message =
-`╭━━━〔 🚀 THENUVA-XMD 〕━━━╮
-┃
-┃ 👋 *HELLO ${pushName}!*
-┃
-┃ 🎉 *WHATSAPP CONNECTED*
-┃ ━━━━━━━━━━━━━━━━━━━━━
-┃
-┃ ✅ Bot connected successfully
-┃
-┃ 👤 *PUSH NAME*
-┃ └─ ${pushName}
-┃
-┃ 📱 *PHONE NUMBER*
-┃ └─ +${phoneNumber}
-┃
-┃ 🟢 *CONNECTION:* ONLINE
-┃ ✅ *STATUS:* SUCCESSFUL
-┃
-┃ 🤖 *BOT:* THENUVA-XMD
-┃
-┃ 💚 Thank you for using
-┃    *THENUVA-XMD* 🚀
-┃
-╰━━〔 ⚡ POWERED BY THENUWA 〕━━╯`;
-
-                        try {
-
-                            await conn.sendMessage(
-                                botJid,
-                                {
-                                    text: message
-                                }
-                            );
-
-                            console.log(
-                                "📨 Connected message sent"
-                            );
-
-                        } catch (sendError) {
-
-                            console.error(
-                                "❌ Failed to send connected message:",
-                                sendError.message
-                            );
-                        }
-                    }
-
-                } catch (error) {
-
-                    console.error(
-                        "❌ Error after connection:",
-                        error
-                    );
-                }
-
-                return;
-            }
-
-            // =========================
-            // CONNECTION CLOSED
-            // =========================
-
-            if (connection === "close") {
-
-                const statusCode =
-                    lastDisconnect?.error?.output?.statusCode;
-
-                console.log("");
-                console.log(
-                    "⚠️ WhatsApp connection closed"
-                );
-
-                console.log(
-                    "📛 Status code:",
-                    statusCode || "unknown"
-                );
-
-                // Logged out
-                if (
-                    statusCode ===
-                    DisconnectReason.loggedOut
-                ) {
-
-                    console.log(
-                        "❌ WhatsApp session logged out."
-                    );
-
-                    console.log(
-                        "🔐 Please pair the number again."
-                    );
-
-                    return;
-                }
-
-                // Bad session / replaced
-                if (
-                    statusCode === 401 ||
-                    statusCode === 403
-                ) {
-
-                    console.log(
-                        "❌ Session is no longer valid."
-                    );
-
-                    console.log(
-                        "🔐 Please create a new pairing session."
-                    );
-
-                    return;
-                }
-
-                // Other connection errors
-                console.log(
-                    "🔄 Connection lost."
-                );
-
-                console.log(
-                    "⏳ Reconnecting in 5 seconds..."
-                );
-
-                setTimeout(() => {
-                    connectToWA().catch((err) => {
-                        console.error(
-                            "❌ Reconnection failed:",
-                            err
-                        );
-                    });
-                }, 5000);
-            }
-        });
-
-    } catch (error) {
-
-        console.error(
-            "❌ WhatsApp initialization failed:"
-        );
-
-        console.error(error);
-
-        console.log(
-            "🔄 Retrying in 10 seconds..."
-        );
-
-        setTimeout(() => {
-            connectToWA().catch(console.error);
-        }, 10000);
-    }
+  console.log("Connecting to WhatsApp ⏳️...");
+  const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions/')
+  var { version } = await fetchLatestBaileysVersion()
+  
+  const conn = makeWASocket({
+          logger: P({ level: 'silent' }),
+          printQRInTerminal: false,
+          browser: Browsers.macOS("Firefox"),
+          syncFullHistory: true,
+          auth: state,
+          version
+          })
+      
+  conn.ev.on('connection.update', (update) => {
+  const { connection, lastDisconnect } = update
+  if (connection === 'close') {
+  if (lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut) {
+  connectToWA()
+  }
+  } else if (connection === 'open') {
+  console.log('🧬 Installing Plugins')
+  const path = require('path');
+  fs.readdirSync("./plugins/").forEach((plugin) => {
+  if (path.extname(plugin).toLowerCase() == ".js") {
+  require("./plugins/" + plugin);
+  }
+  });
+  console.log('Plugins installed successful ✅')
+  console.log('Bot connected to whatsapp ✅')
+  
+  let up = `*Hello There DARK-SHADOW-MD User! \ud83d\udc4b\ud83c\udffb* \n\n> Simple , Straight Forward But Loaded With Features \ud83c\udf8a, Meet DARK-SHADOW MD WhatsApp Bot.\n\n *Thanks for using DARK-SHADOW-MD \ud83d\udea9* \n\n> Join WhatsApp Channel :- ⤵️\n \nhttps://whatsapp.com/channel/0029Vb7bwXEEAKWNJgBICJ0w\n\n- *YOUR PREFIX:* = ${prefix}\n\nDont forget to give star to repo ⬇️\n\nhttps://github.com/DARK-SHADOW-NEW/DARK-SHADOW-V3\n\n> © Powered BY DARK-SHADOW \ud83d\udda4`;
+    conn.sendMessage(conn.user.id, { image: { url: `https://telegra.ph/file/1ece2e0281513c05d20ee.jpg` }, caption: up })
+  }
+  })
+  conn.ev.on('creds.update', saveCreds)
 
   //==============================
 
@@ -417,48 +166,82 @@ const port = process.env.PORT || 8000;
   });
   //============================== 
           
-  //=============readstatus=======
-        
-  conn.ev.on('messages.upsert', async(mek) => {
-    mek = mek.messages[0]
-    if (!mek.message) return
-    mek.message = (getContentType(mek.message) === 'ephemeralMessage') 
-    ? mek.message.ephemeralMessage.message 
-    : mek.message;
-    //console.log("New Message Detected:", JSON.stringify(mek, null, 2));
-  if (config.READ_MESSAGE === 'true') {
-    await conn.readMessages([mek.key]);  // Mark message as read
-    console.log(`Marked message from ${mek.key.remoteJid} as read.`);
-  }
-    if(mek.message.viewOnceMessageV2)
-    mek.message = (getContentType(mek.message) === 'ephemeralMessage') ? mek.message.ephemeralMessage.message : mek.message
-    if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_SEEN === "true"){
-      await conn.readMessages([mek.key])
-    }
-  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REACT === "true"){
-    const jawadlike = await conn.decodeJid(conn.user.id);
-    const emojis = ['❤️', '💸', '😇', '🍂', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🙌', '🙆', '🚩', '🥰', '💐', '😎', '🤎', '✅', '🫀', '🧡', '😁', '😄', '🌸', '🕊️', '🌷', '⛅', '🌟', '🗿', '🇵🇰', '💜', '💙', '🌝', '🖤', '💚'];
-    const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-    await conn.sendMessage(mek.key.remoteJid, {
-      react: {
-        text: randomEmoji,
-        key: mek.key,
-      } 
-    }, { statusJidList: [mek.key.participant, jawadlike] });
-  }                       
-  if (mek.key && mek.key.remoteJid === 'status@broadcast' && config.AUTO_STATUS_REPLY === "true"){
-  const user = mek.key.participant
-  const text = `${config.AUTO_STATUS_MSG}`
-  await conn.sendMessage(user, { text: text, react: { text: '💜', key: mek.key } }, { quoted: mek })
+    conn.ev.on('messages.upsert', async (chatUpdate) => {
+        try {
+            // 🎯 1. ලැබෙන මැසේජ් එක 'mek' ලෙස නිවැරදිව ලබා ගැනීම
+            if (!chatUpdate.messages || chatUpdate.messages.length === 0) return;
+            let mek = chatUpdate.messages[0];
+            if (!mek.message) return;
+
+            // 🎯 2. AUTO STATUS SEEN, REACT & REPLY SYSTEM (Status settings පාලනය)
+            if (mek.key && mek.key.remoteJid === 'status@broadcast') {
+                
+                // A. Auto Status Seen (බැලීම)
+                if (config.AUTO_STATUS_SEEN === "true" || config.AUTO_STATUS_SEEN === true) {
+                    await conn.readMessages([mek.key]);
+                    console.log(`👁️ Status Seen: ${mek.key.participant ? mek.key.participant.split('@')[0] : 'Unknown User'}`);
+
+                    // B. Auto Status React (ඉමෝජි දැමීම)
+                    if (config.AUTO_STATUS_REACT === "true" || config.AUTO_STATUS_REACT === true) {
+                        const emojis = ['❤️', '💸', '😇', '💥', '💯', '🔥', '💫', '💎', '💗', '🤍', '🖤', '👀', '🥰', '💐', '😎', '✅', '🫀', '🌸'];
+                        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+                        await conn.sendMessage(mek.key.remoteJid, {
+                            react: { text: randomEmoji, key: mek.key }
+                        }, { statusJidList: [mek.key.participant, conn.user.id] });
+                    }                       
+
+                    // C. Auto Status Reply (Inbox එකට මැසේජ් යැවීම)
+                    if (config.AUTO_STATUS_REPLY === "true" || config.AUTO_STATUS_REPLY === true) {
+                        const user = mek.key.participant || mek.key.remoteJid;
+                        const replyText = config.AUTO_STATUS_MSG || "*SEEN YOUR STATUS BY DARK-SHADOW -MD 🤍*";
+                        await conn.sendMessage(user, { text: replyText }, { quoted: mek });
+                    }
+                }
+                return; // Status එකක් නම් මෙතනින් කේතය ක්‍රියාත්මක වීම නවතී
             }
+
+            // 📩 3. සාමාන්‍ය CHAT MESSAGES සඳහා වන කොටස
+            
+            // 🛠️ CRITICAL FIX: getContentType එක සාමාන්‍ය function එකක් ලෙස අර්ථ දැක්වීම
+            const getContentType = (message) => {
+                if (!message) return undefined;
+                const keys = Object.keys(message);
+                const key = keys.find(k => k !== 'senderKeyDistributionMessage' && k !== 'messageContextInfo');
+                return key;
+            };
+
+            const type = getContentType(mek.message);
+            const from = mek.key.remoteJid;
+            
+            mek.message = (type === 'ephemeralMessage') 
+                ? mek.message.ephemeralMessage.message 
+                : mek.message;
+
+            // 🛠️ LINE 228 FIXED: දැන් මුළු messages.upsert එකම async(chatUpdate) තුළ පවතින නිසා 'await' එක නිවැරදිව ක්‍රියා කරයි!
+            const botNumber2 = await jidNormalizedUser(conn.user.id);
+            const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : [];
+
+            if (config.READ_MESSAGE === 'true' || config.READ_MESSAGE === true) {
+                await conn.readMessages([mek.key]);
+                console.log(`Marked message from ${from} as read.`);
+            }
+
+            if (mek.message.viewOnceMessageV2) {
+                mek.message = (getContentType(mek.message) === 'ephemeralMessage') 
+                    ? mek.message.ephemeralMessage.message 
+                    : mek.message;
+            }
+
             await Promise.all([
-              saveMessage(mek),
+                saveMessage(mek),
             ]);
-  const m = sms(conn, mek)
-  const type = getContentType(mek.message)
-  const content = JSON.stringify(mek.message)
-  const from = mek.key.remoteJid
-  const quoted = type == 'extendedTextMessage' && mek.message.extendedTextMessage.contextInfo != null ? mek.message.extendedTextMessage.contextInfo.quotedMessage || [] : []
+
+            const m = sms(conn, mek);
+            const content = JSON.stringify(mek.message);
+            
+            // 🚀 බොට්ගේ අනෙකුත් Plugins/Commands ක්‍රියාත්මක වන ප්‍රධාන handler එක මෙතැනට පැමිණේ
+
+        // catch ඉවත් කරන ලදී	
   const body = (type === 'conversation') ? mek.message.conversation : (type === 'extendedTextMessage') ? mek.message.extendedTextMessage.text : (type == 'imageMessage') && mek.message.imageMessage.caption ? mek.message.imageMessage.caption : (type == 'videoMessage') && mek.message.videoMessage.caption ? mek.message.videoMessage.caption : ''
   const isCmd = body.startsWith(prefix)
   var budy = typeof mek.text == 'string' ? mek.text : false;
@@ -473,7 +256,6 @@ const port = process.env.PORT || 8000;
   const pushname = mek.pushName || 'Sin Nombre'
   const isMe = botNumber.includes(senderNumber)
   const isOwner = ownerNumber.includes(senderNumber) || isMe
-  const botNumber2 = await jidNormalizedUser(conn.user.id);
   const groupMetadata = isGroup ? await conn.groupMetadata(from).catch(e => {}) : ''
   const groupName = isGroup ? groupMetadata.subject : ''
   const participants = isGroup ? await groupMetadata.participants : ''
@@ -614,7 +396,11 @@ if (!isReact && senderNumber === botNumber) {
   command.function(conn, mek, m,{from, l, quoted, body, isCmd, command, args, q, text, isGroup, sender, senderNumber, botNumber2, botNumber, pushname, isMe, isOwner, isCreator, groupMetadata, groupName, participants, groupAdmins, isBotAdmins, isAdmins, reply})
   }});
   
-  });
+          } catch (err) {
+            console.error("X Core Messages Upsert Error:", err);
+        }
+    });
+
     //===================================================   
     conn.decodeJid = jid => {
       if (!jid) return jid;
@@ -1052,7 +838,7 @@ if (!isReact && senderNumber === botNumber) {
             return status;
         };
     conn.serializeM = mek => sms(conn, mek, store);
-  
+  }
   
   app.get("/", (req, res) => {
   res.send("DARK SHADOW MD STARTED ✅");
