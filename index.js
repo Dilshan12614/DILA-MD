@@ -404,7 +404,6 @@ const port = process.env.PORT || 8000;
             connectToWA().catch(console.error);
         }, 10000);
     }
-}
 
   //==============================
 
