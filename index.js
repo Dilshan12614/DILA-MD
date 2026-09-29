@@ -120,41 +120,291 @@ const port = process.env.PORT || 8000;
   //=============================================
   
   async function connectToWA() {
-  console.log("Connecting to WhatsApp ⏳️...");
-  const { state, saveCreds } = await useMultiFileAuthState(__dirname + '/sessions/')
-  var { version } = await fetchLatestBaileysVersion()
-  
-  const conn = makeWASocket({
-          logger: P({ level: 'silent' }),
-          printQRInTerminal: false,
-          browser: Browsers.macOS("Firefox"),
-          syncFullHistory: true,
-          auth: state,
-          version
-          })
-      
-  conn.ev.on('connection.update', (update) => {
-  const { connection, lastDisconnect } = update
-  if (connection === 'close') {
-  if (lastDisconnect.error.output.statusCode !== DisconnectReason.loggedOut) {
-  connectToWA()
-  }
-  } else if (connection === 'open') {
-  console.log('🧬 Installing Plugins')
-  const path = require('path');
-  fs.readdirSync("./plugins/").forEach((plugin) => {
-  if (path.extname(plugin).toLowerCase() == ".js") {
-  require("./plugins/" + plugin);
-  }
-  });
-  console.log('Plugins installed successful ✅')
-  console.log('Bot connected to whatsapp ✅')
-  
-  let up = `*Hello There DARK-SHADOW-MD User! \ud83d\udc4b\ud83c\udffb* \n\n> Simple , Straight Forward But Loaded With Features \ud83c\udf8a, Meet DARK-SHADOW MD WhatsApp Bot.\n\n *Thanks for using DARK-SHADOW-MD \ud83d\udea9* \n\n> Join WhatsApp Channel :- ⤵️\n \nhttps://whatsapp.com/channel/0029Vb7bwXEEAKWNJgBICJ0w\n\n- *YOUR PREFIX:* = ${prefix}\n\nDont forget to give star to repo ⬇️\n\nhttps://github.com/DARK-SHADOW-NEW/DARK-SHADOW-V3\n\n> © Powered BY DARK-SHADOW \ud83d\udda4`;
-    conn.sendMessage(conn.user.id, { image: { url: `https://telegra.ph/file/1ece2e0281513c05d20ee.jpg` }, caption: up })
-  }
-  })
-  conn.ev.on('creds.update', saveCreds)
+    try {
+        console.log("╭──────────────────────────────╮");
+        console.log("│   🚀 THENUVA-XMD STARTING     │");
+        console.log("╰──────────────────────────────╯");
+
+        const sessionPath = __dirname + "/sessions/";
+
+        // Make sure sessions folder exists
+        if (!fs.existsSync(sessionPath)) {
+            fs.mkdirSync(sessionPath, { recursive: true });
+        }
+
+        console.log("📂 Session path:", sessionPath);
+
+        const { state, saveCreds } =
+            await useMultiFileAuthState(sessionPath);
+
+        const { version } = await fetchLatestBaileysVersion();
+
+        console.log("📡 Connecting to WhatsApp...");
+        console.log("📦 Baileys version:", version.join("."));
+
+        const conn = makeWASocket({
+            logger: P({ level: "silent" }),
+
+            printQRInTerminal: false,
+
+            browser: Browsers.macOS("Firefox"),
+
+            auth: state,
+
+            version,
+
+            syncFullHistory: false,
+
+            markOnlineOnConnect: false,
+
+            generateHighQualityLinkPreview: false,
+
+            connectTimeoutMs: 60000,
+
+            defaultQueryTimeoutMs: 60000,
+
+            keepAliveIntervalMs: 30000
+        });
+
+        // Save credentials whenever they change
+        conn.ev.on("creds.update", saveCreds);
+
+        conn.ev.on("connection.update", async (update) => {
+            const {
+                connection,
+                lastDisconnect
+            } = update;
+
+            console.log("🔄 Connection update:", connection);
+
+            // =========================
+            // CONNECTED
+            // =========================
+            if (connection === "open") {
+
+                console.log("");
+                console.log("╭──────────────────────────────╮");
+                console.log("│     ✅ WHATSAPP CONNECTED     │");
+                console.log("╰──────────────────────────────╯");
+
+                try {
+                    // Install plugins only once
+                    console.log("🧩 Installing plugins...");
+
+                    const path = require("path");
+
+                    const pluginDir = path.join(
+                        __dirname,
+                        "plugins"
+                    );
+
+                    if (fs.existsSync(pluginDir)) {
+
+                        const plugins = fs
+                            .readdirSync(pluginDir)
+                            .filter(
+                                (plugin) =>
+                                    path
+                                        .extname(plugin)
+                                        .toLowerCase() === ".js"
+                            );
+
+                        for (const plugin of plugins) {
+                            try {
+                                require(
+                                    path.join(
+                                        pluginDir,
+                                        plugin
+                                    )
+                                );
+
+                                console.log(
+                                    "✅ Plugin loaded:",
+                                    plugin
+                                );
+
+                            } catch (pluginError) {
+
+                                console.error(
+                                    "❌ Plugin failed:",
+                                    plugin
+                                );
+
+                                console.error(
+                                    pluginError.message
+                                );
+                            }
+                        }
+                    }
+
+                    console.log("✅ Plugins installed");
+                    console.log("🤖 THENUVA-XMD is ONLINE");
+
+                    // =========================
+                    // CONNECTED MESSAGE
+                    // =========================
+
+                    const botJid = conn.user?.id;
+
+                    if (botJid) {
+
+                        const pushName =
+                            conn.user?.name ||
+                            conn.user?.verifiedName ||
+                            "WhatsApp User";
+
+                        const phoneNumber =
+                            botJid.split(":")[0].split("@")[0];
+
+                        const message =
+`╭━━━〔 🚀 THENUVA-XMD 〕━━━╮
+┃
+┃ 👋 *HELLO ${pushName}!*
+┃
+┃ 🎉 *WHATSAPP CONNECTED*
+┃ ━━━━━━━━━━━━━━━━━━━━━
+┃
+┃ ✅ Bot connected successfully
+┃
+┃ 👤 *PUSH NAME*
+┃ └─ ${pushName}
+┃
+┃ 📱 *PHONE NUMBER*
+┃ └─ +${phoneNumber}
+┃
+┃ 🟢 *CONNECTION:* ONLINE
+┃ ✅ *STATUS:* SUCCESSFUL
+┃
+┃ 🤖 *BOT:* THENUVA-XMD
+┃
+┃ 💚 Thank you for using
+┃    *THENUVA-XMD* 🚀
+┃
+╰━━〔 ⚡ POWERED BY THENUWA 〕━━╯`;
+
+                        try {
+
+                            await conn.sendMessage(
+                                botJid,
+                                {
+                                    text: message
+                                }
+                            );
+
+                            console.log(
+                                "📨 Connected message sent"
+                            );
+
+                        } catch (sendError) {
+
+                            console.error(
+                                "❌ Failed to send connected message:",
+                                sendError.message
+                            );
+                        }
+                    }
+
+                } catch (error) {
+
+                    console.error(
+                        "❌ Error after connection:",
+                        error
+                    );
+                }
+
+                return;
+            }
+
+            // =========================
+            // CONNECTION CLOSED
+            // =========================
+
+            if (connection === "close") {
+
+                const statusCode =
+                    lastDisconnect?.error?.output?.statusCode;
+
+                console.log("");
+                console.log(
+                    "⚠️ WhatsApp connection closed"
+                );
+
+                console.log(
+                    "📛 Status code:",
+                    statusCode || "unknown"
+                );
+
+                // Logged out
+                if (
+                    statusCode ===
+                    DisconnectReason.loggedOut
+                ) {
+
+                    console.log(
+                        "❌ WhatsApp session logged out."
+                    );
+
+                    console.log(
+                        "🔐 Please pair the number again."
+                    );
+
+                    return;
+                }
+
+                // Bad session / replaced
+                if (
+                    statusCode === 401 ||
+                    statusCode === 403
+                ) {
+
+                    console.log(
+                        "❌ Session is no longer valid."
+                    );
+
+                    console.log(
+                        "🔐 Please create a new pairing session."
+                    );
+
+                    return;
+                }
+
+                // Other connection errors
+                console.log(
+                    "🔄 Connection lost."
+                );
+
+                console.log(
+                    "⏳ Reconnecting in 5 seconds..."
+                );
+
+                setTimeout(() => {
+                    connectToWA().catch((err) => {
+                        console.error(
+                            "❌ Reconnection failed:",
+                            err
+                        );
+                    });
+                }, 5000);
+            }
+        });
+
+    } catch (error) {
+
+        console.error(
+            "❌ WhatsApp initialization failed:"
+        );
+
+        console.error(error);
+
+        console.log(
+            "🔄 Retrying in 10 seconds..."
+        );
+
+        setTimeout(() => {
+            connectToWA().catch(console.error);
+        }, 10000);
+    }
+}
 
   //==============================
 
